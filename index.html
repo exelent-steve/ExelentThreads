@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ExelentThreads - Demo</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-left">
+            <h1 class="logo">🧵 ExelentThreads</h1>
+            <span class="project-name">Enterprise SaaS Platform</span>
+        </div>
+        <div class="header-center">
+            <div class="search-container">
+                <input type="text" id="global-search" class="global-search-input" placeholder="🔍 Search across all topics..." />
+            </div>
+        </div>
+        <div class="header-right">
+            <button id="help-btn" class="btn btn-secondary">❓ Help</button>
+            <button id="ai-insights-btn" class="btn btn-primary">🤖 Get AI Insights</button>
+            <button id="new-topic-btn" class="btn btn-secondary">+ New Topic</button>
+            <button id="export-btn" class="btn btn-secondary">↓ Export</button>
+        </div>
+    </header>
+
+    <!-- Help Modal -->
+    <div id="help-modal" class="search-modal hidden">
+        <div class="search-modal-backdrop"></div>
+        <div class="search-modal-content">
+            <div class="search-modal-header">
+                <h3>💡 How to Use ExelentThreads Demo</h3>
+                <button class="search-modal-close" id="help-modal-close">✕</button>
+            </div>
+            <div class="search-modal-body">
+                <div class="help-section">
+                    <h4>🎯 Smart Suggestions Panel (Killer Feature)</h4>
+                    <p>Type in any message box to see related topics from your history:</p>
+                    <div class="help-keywords">
+                        <span class="help-keyword">"error"</span>
+                        <span class="help-keyword">"validation"</span>
+                        <span class="help-keyword">"REST"</span>
+                        <span class="help-keyword">"API"</span>
+                        <span class="help-keyword">"GraphQL"</span>
+                        <span class="help-keyword">"database"</span>
+                        <span class="help-keyword">"PostgreSQL"</span>
+                        <span class="help-keyword">"monolith"</span>
+                        <span class="help-keyword">"microservice"</span>
+                        <span class="help-keyword">"inline"</span>
+                        <span class="help-keyword">"modal"</span>
+                    </div>
+                </div>
+
+                <div class="help-section">
+                    <h4>🔍 Global Search</h4>
+                    <p>Use the search bar at the top to find topics across all conversations. Try:</p>
+                    <div class="help-keywords">
+                        <span class="help-keyword">"confidence score"</span>
+                        <span class="help-keyword">"team familiarity"</span>
+                        <span class="help-keyword">"graceful fallback"</span>
+                    </div>
+                </div>
+
+                <div class="help-section">
+                    <h4>📈 Analytics Dashboard</h4>
+                    <p>Click the "Analytics" tab to see patterns the system has learned about your preferences.</p>
+                </div>
+
+                <div class="help-section">
+                    <h4>⚠️ Contradiction Detector</h4>
+                    <p>Look for the topic titled <strong>"CONTRADICTION: GraphQL for admin panel"</strong> to see conflict detection in action.</p>
+                </div>
+
+                <div class="help-section">
+                    <h4>🔗 Related Topics</h4>
+                    <p>Topics with a 🔗 icon in the sidebar have related discussions. Click any topic to see the blue "Related" bar at the top.</p>
+                </div>
+
+                <div class="help-section">
+                    <h4>📅 Timeline View</h4>
+                    <p>Click the "Timeline" tab to see your topics in a visual, game-like horizontal timeline.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search Results Modal -->
+    <div id="search-modal" class="search-modal hidden">
+        <div class="search-modal-backdrop"></div>
+        <div class="search-modal-content">
+            <div class="search-modal-header">
+                <h3>Search Results</h3>
+                <button class="search-modal-close" id="search-modal-close">✕</button>
+            </div>
+            <div class="search-modal-body" id="search-results"></div>
+        </div>
+    </div>
+
+    <!-- Topic Detail Modal (Trello-style) -->
+    <div id="topic-detail-modal" class="topic-modal hidden">
+        <div class="topic-modal-backdrop"></div>
+        <div class="topic-modal-content">
+            <div class="topic-modal-header">
+                <div id="topic-modal-title"></div>
+                <button class="search-modal-close" id="topic-modal-close">✕</button>
+            </div>
+            <div class="topic-modal-body" id="topic-modal-body"></div>
+        </div>
+    </div>
+
+    <!-- View Switcher -->
+    <nav class="view-switcher">
+        <button class="view-tab active" data-view="conversation">💬 Conversation</button>
+        <button class="view-tab" data-view="table">📊 Table</button>
+        <button class="view-tab" data-view="board">📋 Board</button>
+        <button class="view-tab" data-view="timeline">📅 Timeline</button>
+        <button class="view-tab" data-view="analytics">📈 Analytics</button>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main id="view-container" class="view-container">
+        <!-- Active view renders here -->
+    </main>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- Scripts -->
+    <script src="data.js"></script>
+    <script src="utils.js"></script>
+    <script src="conversation-view.js"></script>
+    <script src="table-view.js"></script>
+    <script src="board-view.js"></script>
+    <script src="analytics-view.js"></script>
+    <script src="timeline-view.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
