@@ -323,8 +323,12 @@ class ConversationView {
             <div class="suggestions-header">💡 Related Topics from Your History</div>
             ${relatedTopics.map(topic => `
                 <div class="suggestion-item">
+                    <div class="suggestion-confidence-badge ${this.getConfidenceClass(topic.similarity)}">
+                        <span class="confidence-icon">${this.getConfidenceIcon(topic.similarity)}</span>
+                        <span class="confidence-text">${this.getConfidenceText(topic.similarity)}</span>
+                        <span class="confidence-score">${topic.similarity}% match</span>
+                    </div>
                     <div class="suggestion-title">
-                        <span class="suggestion-similarity">${topic.similarity}% similar</span>
                         ${escapeHtml(topic.title)}
                     </div>
                     <div class="suggestion-meta">
@@ -344,6 +348,24 @@ class ConversationView {
                 </div>
             `).join('')}
         `;
+    }
+
+    getConfidenceClass(similarity) {
+        if (similarity >= 70) return 'confidence-high';
+        if (similarity >= 40) return 'confidence-medium';
+        return 'confidence-low';
+    }
+
+    getConfidenceIcon(similarity) {
+        if (similarity >= 70) return '✓';
+        if (similarity >= 40) return '○';
+        return '△';
+    }
+
+    getConfidenceText(similarity) {
+        if (similarity >= 70) return 'High confidence';
+        if (similarity >= 40) return 'Medium confidence';
+        return 'Low confidence - might not be relevant';
     }
 
     hideSmartSuggestions() {

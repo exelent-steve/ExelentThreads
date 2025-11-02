@@ -41,6 +41,14 @@ class App {
             });
         }
         
+        // Ask AI button
+        const askAiBtn = document.getElementById('ask-ai-btn');
+        if (askAiBtn) {
+            askAiBtn.addEventListener('click', () => {
+                this.openAskAiModal();
+            });
+        }
+
         // Export button
         const exportBtn = document.getElementById('export-btn');
         if (exportBtn) {
@@ -48,7 +56,7 @@ class App {
                 this.handleExport();
             });
         }
-        
+
         // New topic button
         const newTopicBtn = document.getElementById('new-topic-btn');
         if (newTopicBtn) {
@@ -135,9 +143,35 @@ class App {
             });
         }
 
+        // Ask AI modal close
+        const askAiModalClose = document.getElementById('ask-ai-modal-close');
+        const askAiModal = document.getElementById('ask-ai-modal');
+
+        if (askAiModalClose) {
+            askAiModalClose.addEventListener('click', () => {
+                this.closeAskAiModal();
+            });
+        }
+
+        if (askAiModal) {
+            askAiModal.addEventListener('click', (e) => {
+                if (e.target.classList.contains('search-modal-backdrop') || e.target.classList.contains('search-modal')) {
+                    this.closeAskAiModal();
+                }
+            });
+        }
+
         // Global Escape key listener for all modals
         const escapeHandler = (e) => {
             if (e.key === 'Escape' || e.keyCode === 27) {
+                // Close Ask AI modal
+                const askAiModal = document.getElementById('ask-ai-modal');
+                if (askAiModal && !askAiModal.classList.contains('hidden')) {
+                    this.closeAskAiModal();
+                    e.preventDefault();
+                    return;
+                }
+
                 // Close search modal
                 const searchModal = document.getElementById('search-modal');
                 if (searchModal && !searchModal.classList.contains('hidden')) {
@@ -619,6 +653,283 @@ class App {
                 this.views.conversation.switchTopic(topicId);
             }
         }, 100);
+    }
+
+    // Ask AI Across All Topics
+    openAskAiModal() {
+        const modal = document.getElementById('ask-ai-modal');
+        const resultsContainer = document.getElementById('ask-ai-results');
+
+        // Clear previous results
+        resultsContainer.innerHTML = '';
+
+        modal.classList.remove('hidden');
+
+        // Focus input
+        setTimeout(() => {
+            const input = document.getElementById('ask-ai-input');
+            if (input) input.focus();
+        }, 100);
+
+        // Attach event listeners
+        this.attachAskAiListeners();
+    }
+
+    closeAskAiModal() {
+        const modal = document.getElementById('ask-ai-modal');
+        modal.classList.add('hidden');
+    }
+
+    attachAskAiListeners() {
+        const input = document.getElementById('ask-ai-input');
+        const searchBtn = document.getElementById('ask-ai-search-btn');
+        const examples = document.querySelectorAll('.ask-ai-example');
+
+        if (searchBtn && input) {
+            const handleAsk = () => {
+                const question = input.value.trim();
+                if (question) {
+                    this.handleAskAI(question);
+                }
+            };
+
+            searchBtn.addEventListener('click', handleAsk);
+            input.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') handleAsk();
+            });
+        }
+
+        // Example questions
+        examples.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const question = e.target.dataset.question;
+                if (input) input.value = question;
+                this.handleAskAI(question);
+            });
+        });
+    }
+
+    handleAskAI(question) {
+        const resultsContainer = document.getElementById('ask-ai-results');
+
+        // Show loading state
+        resultsContainer.innerHTML = `
+            <div class="ask-ai-loading">
+                <div class="ask-ai-loading-spinner"></div>
+                <p>Searching across all ${this.data.topics.length} conversations...</p>
+            </div>
+        `;
+
+        // Simulate AI processing
+        setTimeout(() => {
+            const results = this.searchAcrossAllTopics(question);
+            this.displayAskAiResults(question, results);
+        }, 1200);
+    }
+
+    searchAcrossAllTopics(question) {
+        const keywords = question.toLowerCase().split(' ').filter(w => w.length > 2);
+        const results = [];
+
+        this.data.topics.forEach(topic => {
+            let relevantExchanges = [];
+            let score = 0;
+
+            // Check title
+            if (topic.title.toLowerCase().includes(keywords.join(' ')) ||
+                keywords.some(k => topic.title.toLowerCase().includes(k))) {
+                score += 30;
+            }
+
+            // Check each exchange
+            topic.exchanges.forEach((exchange, index) => {
+                const content = exchange.content.toLowerCase();
+                let exchangeScore = 0;
+
+                keywords.forEach(keyword => {
+                    if (content.includes(keyword)) {
+                        exchangeScore += 10;
+                    }
+                });
+
+                if (exchangeScore > 0) {
+                    relevantExchanges.push({
+                        exchange,
+                        index,
+                        score: exchangeScore
+                    });
+                    score += exchangeScore;
+                }
+            });
+
+            if (score > 0) {
+                results.push({
+                    topic,
+                    score,
+                    relevantExchanges: relevantExchanges.sort((a, b) => b.score - a.score).slice(0, 3),
+                    confidence: Math.min(95, score)
+                });
+            }
+        });
+
+        return results.sort((a, b) => b.score - a.score).slice(0, 5);
+    }
+
+    displayAskAiResults(question, results) {
+        const resultsContainer = document.getElementById('ask-ai-results');
+
+        if (results.length === 0) {
+            resultsContainer.innerHTML = `
+                <div class="ask-ai-no-results">
+                    <div class="ask-ai-no-results-icon">🤔</div>
+                    <div class="ask-ai-no-results-text">
+                        No relevant conversations found for "${escapeHtml(question)}"
+                    </div>
+                    <p class="ask-ai-suggestion">Try rephrasing your question or use different keywords</p>
+                </div>
+            `;
+            return;
+        }
+
+        const totalTopics = results.length;
+        const avgConfidence = Math.round(results.reduce((sum, r) => sum + r.confidence, 0) / results.length);
+
+        resultsContainer.innerHTML = `
+            <div class="ask-ai-results-header">
+                <div class="ask-ai-answer-summary">
+                    <strong>🎯 AI Answer:</strong> Found ${totalTopics} relevant conversation${totalTopics > 1 ? 's' : ''}
+                    <span class="ask-ai-confidence ${this.getConfidenceClass(avgConfidence)}">${avgConfidence}% confidence</span>
+                </div>
+            </div>
+
+            ${results.map((result, index) => `
+                <div class="ask-ai-result-card">
+                    <div class="ask-ai-result-header">
+                        <div class="ask-ai-result-rank">#${index + 1}</div>
+                        <div class="ask-ai-result-title-section">
+                            <div class="ask-ai-result-title">${escapeHtml(result.topic.title)}</div>
+                            <div class="ask-ai-result-meta">
+                                <span class="status-badge ${result.topic.status}">${result.topic.status.replace('-', ' ')}</span>
+                                <span>${result.topic.category}</span>
+                                <span>${formatRelativeTime(result.topic.updated)}</span>
+                            </div>
+                        </div>
+                        <div class="ask-ai-result-confidence ${this.getConfidenceClass(result.confidence)}">
+                            ${result.confidence}% match
+                        </div>
+                    </div>
+
+                    <div class="ask-ai-relevant-exchanges">
+                        ${result.relevantExchanges.map(re => `
+                            <div class="ask-ai-exchange">
+                                <div class="ask-ai-exchange-speaker ${re.exchange.speaker}">
+                                    ${re.exchange.speaker === 'user' ? '👤 You' : '🤖 Claude'}
+                                </div>
+                                <div class="ask-ai-exchange-content">
+                                    ${this.highlightKeywords(escapeHtml(re.exchange.content), question)}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+
+                    <div class="ask-ai-result-actions">
+                        <button class="btn-small" onclick="window.app.openTopicDetailModal('${result.topic.id}')">
+                            📖 View Full Conversation
+                        </button>
+                    </div>
+                </div>
+            `).join('')}
+        `;
+    }
+
+    getConfidenceClass(confidence) {
+        if (confidence >= 70) return 'confidence-high';
+        if (confidence >= 40) return 'confidence-medium';
+        return 'confidence-low';
+    }
+
+    highlightKeywords(text, question) {
+        const keywords = question.toLowerCase().split(' ').filter(w => w.length > 2);
+        let highlighted = text;
+
+        keywords.forEach(keyword => {
+            const regex = new RegExp(`(${keyword})`, 'gi');
+            highlighted = highlighted.replace(regex, '<mark class="ask-ai-highlight">$1</mark>');
+        });
+
+        return highlighted;
+    }
+
+    previewMerge(topicIds) {
+        const topics = topicIds.map(id => findTopicById(this.data.topics, id)).filter(Boolean);
+        if (topics.length < 2) return;
+
+        // Create preview modal
+        const modal = document.getElementById('topic-detail-modal');
+        const titleContainer = document.getElementById('topic-modal-title');
+        const bodyContainer = document.getElementById('topic-modal-body');
+
+        // Generate merged title (use first topic's title or create combined)
+        const mergedTitle = `Merged: ${topics[0].title}`;
+
+        // Combine all exchanges in chronological order
+        const allExchanges = [];
+        topics.forEach(topic => {
+            allExchanges.push(...topic.exchanges.map(ex => ({
+                ...ex,
+                sourceTopic: topic.title
+            })));
+        });
+        allExchanges.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+
+        titleContainer.innerHTML = `
+            <div class="merge-preview-badge">🔀 Merge Preview</div>
+            <h2>${escapeHtml(mergedTitle)}</h2>
+            <div class="merge-preview-meta">
+                Combining ${topics.length} topics • ${allExchanges.length} total exchanges
+            </div>
+        `;
+
+        bodyContainer.innerHTML = `
+            <div class="merge-preview-info">
+                <div class="merge-preview-warning">
+                    ⚠️ This is a preview. No topics will be modified until you confirm the merge.
+                </div>
+                <div class="merge-preview-topics">
+                    <strong>Topics being merged:</strong>
+                    <ul>
+                        ${topics.map(t => `<li>${escapeHtml(t.title)} (${t.exchanges.length} exchanges)</li>`).join('')}
+                    </ul>
+                </div>
+            </div>
+
+            <div class="topic-modal-exchanges">
+                <h4>Combined Exchange History</h4>
+                ${allExchanges.map(exchange => `
+                    <div class="message ${exchange.speaker}">
+                        <div class="message-header">
+                            <span class="message-speaker ${exchange.speaker}">
+                                ${exchange.speaker === 'user' ? 'You' : 'Claude'}
+                            </span>
+                            <span class="message-time">${formatFullTime(exchange.timestamp)}</span>
+                            <span class="message-source">from: ${escapeHtml(exchange.sourceTopic)}</span>
+                        </div>
+                        <div class="message-content">${escapeHtml(exchange.content)}</div>
+                    </div>
+                `).join('')}
+            </div>
+
+            <div class="merge-preview-actions">
+                <button class="btn btn-primary" onclick="showToast('In the real app, this would merge the topics and update all references')">
+                    ✓ Confirm Merge
+                </button>
+                <button class="btn btn-secondary" onclick="document.getElementById('topic-detail-modal').classList.add('hidden')">
+                    Cancel
+                </button>
+            </div>
+        `;
+
+        modal.classList.remove('hidden');
     }
 }
 

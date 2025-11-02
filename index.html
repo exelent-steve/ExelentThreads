@@ -19,8 +19,9 @@
             </div>
         </div>
         <div class="header-right">
+            <button id="ask-ai-btn" class="btn btn-primary">🔮 Ask AI Anything</button>
             <button id="help-btn" class="btn btn-secondary">❓ Help</button>
-            <button id="ai-insights-btn" class="btn btn-primary">🤖 Get AI Insights</button>
+            <button id="ai-insights-btn" class="btn btn-secondary">📊 Insights</button>
             <button id="new-topic-btn" class="btn btn-secondary">+ New Topic</button>
             <button id="export-btn" class="btn btn-secondary">↓ Export</button>
         </div>
@@ -107,6 +108,33 @@
                 <button class="search-modal-close" id="topic-modal-close">✕</button>
             </div>
             <div class="topic-modal-body" id="topic-modal-body"></div>
+        </div>
+    </div>
+
+    <!-- Ask AI Modal -->
+    <div id="ask-ai-modal" class="search-modal hidden">
+        <div class="search-modal-backdrop"></div>
+        <div class="search-modal-content ask-ai-modal-content">
+            <div class="search-modal-header">
+                <h3>🔮 Ask AI Anything</h3>
+                <button class="search-modal-close" id="ask-ai-modal-close">✕</button>
+            </div>
+            <div class="search-modal-body">
+                <div class="ask-ai-input-section">
+                    <p class="ask-ai-description">Ask a question about anything you've discussed across all your conversations</p>
+                    <div class="ask-ai-input-group">
+                        <input type="text" id="ask-ai-input" class="ask-ai-input" placeholder='Try: "What did I decide about authentication?" or "Have I discussed database scaling?"'>
+                        <button class="btn btn-primary" id="ask-ai-search-btn">Ask AI</button>
+                    </div>
+                    <div class="ask-ai-examples">
+                        <span class="ask-ai-example-label">Examples:</span>
+                        <button class="ask-ai-example" data-question="What did I decide about REST vs GraphQL?">REST vs GraphQL?</button>
+                        <button class="ask-ai-example" data-question="What database choices have I made?">Database choices?</button>
+                        <button class="ask-ai-example" data-question="How do I handle errors?">Error handling?</button>
+                    </div>
+                </div>
+                <div id="ask-ai-results" class="ask-ai-results"></div>
+            </div>
         </div>
     </div>
 

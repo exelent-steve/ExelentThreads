@@ -10,6 +10,7 @@ class AnalyticsView {
         const stats = this.calculateStatistics();
         const patterns = this.detectPatterns();
         const activity = this.getRecentActivity();
+        const mergeSuggestions = this.detectMergeCandidates();
 
         container.innerHTML = `
             <div class="analytics-view">
@@ -135,6 +136,47 @@ class AnalyticsView {
                             `).join('')}
                         </div>
                     </div>
+
+                    <!-- Merge Suggestions -->
+                    ${mergeSuggestions.length > 0 ? `
+                        <div class="analytics-section merge-suggestions-section">
+                            <h3 class="section-title">🔗 Topic Merge Suggestions</h3>
+                            <p class="merge-description">AI detected ${mergeSuggestions.length} group${mergeSuggestions.length > 1 ? 's' : ''} of similar topics that could be merged</p>
+                            <div class="merge-list">
+                                ${mergeSuggestions.map((suggestion, index) => `
+                                    <div class="merge-suggestion-card">
+                                        <div class="merge-header">
+                                            <div class="merge-title">
+                                                <span class="merge-icon">🔀</span>
+                                                Suggested Merge #${index + 1}
+                                            </div>
+                                            <div class="merge-confidence ${this.getMergeConfidenceClass(suggestion.confidence)}">
+                                                ${suggestion.confidence}% similarity
+                                            </div>
+                                        </div>
+                                        <div class="merge-reason">${suggestion.reason}</div>
+                                        <div class="merge-topics-list">
+                                            ${suggestion.topics.map(topic => `
+                                                <div class="merge-topic-item">
+                                                    <span class="merge-topic-status status-badge ${topic.status}">${topic.status}</span>
+                                                    <span class="merge-topic-title">${escapeHtml(topic.title)}</span>
+                                                    <span class="merge-topic-meta">${topic.exchanges.length} exchanges</span>
+                                                </div>
+                                            `).join('')}
+                                        </div>
+                                        <div class="merge-actions">
+                                            <button class="btn-small btn-primary-small" onclick="window.app.previewMerge([${suggestion.topics.map(t => `'${t.id}'`).join(',')}])">
+                                                👁️ Preview Merge
+                                            </button>
+                                            <button class="btn-small" onclick="showToast('In the real app, this would merge the topics')">
+                                                Dismiss
+                                            </button>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    ` : ''}
                 </div>
             </div>
         `;
@@ -326,5 +368,129 @@ class AnalyticsView {
         });
 
         return activity;
+    }
+
+    detectMergeCandidates() {
+        const candidates = [];
+        const processed = new Set();
+
+        // Compare all topics pairwise
+        for (let i = 0; i < this.data.topics.length; i++) {
+            if (processed.has(this.data.topics[i].id)) continue;
+
+            const baseTopic = this.data.topics[i];
+            const similarTopics = [baseTopic];
+
+            for (let j = i + 1; j < this.data.topics.length; j++) {
+                if (processed.has(this.data.topics[j].id)) continue;
+
+                const compareTopic = this.data.topics[j];
+                const similarity = this.calculateTopicSimilarity(baseTopic, compareTopic);
+
+                if (similarity >= 60) { // 60% threshold for merge suggestion
+                    similarTopics.push(compareTopic);
+                    processed.add(compareTopic.id);
+                }
+            }
+
+            if (similarTopics.length >= 2) {
+                candidates.push({
+                    topics: similarTopics,
+                    confidence: this.calculateGroupConfidence(similarTopics),
+                    reason: this.generateMergeReason(similarTopics)
+                });
+                similarTopics.forEach(t => processed.add(t.id));
+            }
+        }
+
+        return candidates.sort((a, b) => b.confidence - a.confidence);
+    }
+
+    calculateTopicSimilarity(topic1, topic2) {
+        let score = 0;
+
+        // Category match (30 points)
+        if (topic1.category && topic2.category && topic1.category === topic2.category) {
+            score += 30;
+        }
+
+        // Title similarity (40 points max)
+        const title1Words = topic1.title.toLowerCase().split(/\s+/).filter(w => w.length > 3);
+        const title2Words = topic2.title.toLowerCase().split(/\s+/).filter(w => w.length > 3);
+        const titleOverlap = title1Words.filter(w => title2Words.includes(w)).length;
+        const titleScore = (titleOverlap / Math.max(title1Words.length, title2Words.length)) * 40;
+        score += titleScore;
+
+        // Content similarity (30 points max)
+        const content1 = topic1.exchanges.map(e => e.content.toLowerCase()).join(' ');
+        const content2 = topic2.exchanges.map(e => e.content.toLowerCase()).join(' ');
+
+        // Extract significant words (>4 chars, not common words)
+        const commonWords = ['this', 'that', 'with', 'from', 'have', 'will', 'would', 'should', 'could', 'their', 'there', 'what', 'when', 'where', 'which'];
+        const words1 = content1.split(/\s+/).filter(w => w.length > 4 && !commonWords.includes(w));
+        const words2 = content2.split(/\s+/).filter(w => w.length > 4 && !commonWords.includes(w));
+
+        // Count shared significant words
+        const uniqueWords1 = [...new Set(words1)].slice(0, 20); // Top 20 unique words
+        const uniqueWords2 = [...new Set(words2)].slice(0, 20);
+        const contentOverlap = uniqueWords1.filter(w => uniqueWords2.includes(w)).length;
+        const contentScore = (contentOverlap / Math.max(uniqueWords1.length, uniqueWords2.length)) * 30;
+        score += contentScore;
+
+        return Math.round(score);
+    }
+
+    calculateGroupConfidence(topics) {
+        if (topics.length === 2) {
+            return this.calculateTopicSimilarity(topics[0], topics[1]);
+        }
+
+        // For multiple topics, calculate average pairwise similarity
+        let totalSimilarity = 0;
+        let comparisons = 0;
+
+        for (let i = 0; i < topics.length; i++) {
+            for (let j = i + 1; j < topics.length; j++) {
+                totalSimilarity += this.calculateTopicSimilarity(topics[i], topics[j]);
+                comparisons++;
+            }
+        }
+
+        return Math.round(totalSimilarity / comparisons);
+    }
+
+    generateMergeReason(topics) {
+        const categories = [...new Set(topics.map(t => t.category).filter(Boolean))];
+        const titleWords = topics.map(t =>
+            t.title.toLowerCase().split(/\s+/).filter(w => w.length > 3)
+        );
+
+        // Find common keywords
+        const allWords = titleWords.flat();
+        const wordCounts = {};
+        allWords.forEach(word => {
+            wordCounts[word] = (wordCounts[word] || 0) + 1;
+        });
+        const commonKeywords = Object.entries(wordCounts)
+            .filter(([word, count]) => count >= 2)
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 3)
+            .map(([word]) => word);
+
+        if (categories.length === 1 && commonKeywords.length > 0) {
+            return `All topics are about "${categories[0]}" and discuss: ${commonKeywords.join(', ')}`;
+        } else if (commonKeywords.length >= 2) {
+            return `Topics share common themes: ${commonKeywords.join(', ')}`;
+        } else if (categories.length === 1) {
+            return `All topics are in the same category: "${categories[0]}"`;
+        } else {
+            return 'Topics discuss similar concepts and could be consolidated';
+        }
+    }
+
+    getMergeConfidenceClass(confidence) {
+        if (confidence >= 80) return 'confidence-high';
+        if (confidence >= 60) return 'confidence-medium';
+        return 'confidence-low';
     }
 }
