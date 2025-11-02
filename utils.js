@@ -117,6 +117,15 @@ function findTopicById(topics, id) {
     return topics.find(topic => topic.id === id);
 }
 
+// Find topic by ID across all projects
+function findTopicByIdInProjects(projects, topicId) {
+    for (const project of projects) {
+        const topic = project.topics.find(t => t.id === topicId);
+        if (topic) return topic;
+    }
+    return null;
+}
+
 // Sort topics
 function sortTopics(topics, sortBy) {
     const sorted = [...topics];

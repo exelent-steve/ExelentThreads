@@ -326,8 +326,9 @@ class App {
         const originalText = button.textContent;
         button.textContent = '⏳ Analyzing...';
         
-        // Format all topics and exchanges for AI
-        const activeTopics = this.data.topics.filter(t => t.status !== 'archived');
+        // Format all topics and exchanges for AI (across all projects)
+        const allTopics = this.data.projects.flatMap(p => p.topics);
+        const activeTopics = allTopics.filter(t => t.status !== 'archived');
         
         let aiPayload = {
             totalTopics: activeTopics.length,
@@ -384,7 +385,10 @@ class App {
         const lowerQuery = query.toLowerCase();
         const results = [];
 
-        this.data.topics.forEach(topic => {
+        // Search across all projects
+        const allTopics = this.data.projects.flatMap(p => p.topics);
+
+        allTopics.forEach(topic => {
             let matches = [];
 
             // Search in title
@@ -509,7 +513,7 @@ class App {
     }
 
     openTopicDetailModal(topicId) {
-        const topic = findTopicById(this.data.topics, topicId);
+        const topic = findTopicByIdInProjects(this.data.projects, topicId);
         if (!topic) return;
 
         const modal = document.getElementById('topic-detail-modal');
@@ -612,7 +616,7 @@ class App {
     }
 
     handleModalMessage(topicId, message) {
-        const topic = findTopicById(this.data.topics, topicId);
+        const topic = findTopicByIdInProjects(this.data.projects, topicId);
         if (!topic) return;
 
         // Add user message
@@ -684,7 +688,10 @@ class App {
         const keywords = searchText.toLowerCase().split(' ').filter(w => w.length > 3);
         if (keywords.length === 0) return [];
 
-        const scoredTopics = this.data.topics.map(topic => {
+        // Search across all projects
+        const allTopics = this.data.projects.flatMap(p => p.topics);
+
+        const scoredTopics = allTopics.map(topic => {
             let score = 0;
 
             keywords.forEach(keyword => {
@@ -712,7 +719,7 @@ class App {
 
     renderContradictionWarning(topic) {
         if (!topic.contradictsWith) return '';
-        const contradictingTopic = findTopicById(this.data.topics, topic.contradictsWith);
+        const contradictingTopic = findTopicByIdInProjects(this.data.projects, topic.contradictsWith);
         if (!contradictingTopic) return '';
 
         return `
@@ -736,7 +743,7 @@ class App {
             <div class="related-topics-bar">
                 <span class="related-topics-label">🔗 Related:</span>
                 ${topic.relatedTopics.slice(0, 3).map(relatedId => {
-                    const relatedTopic = findTopicById(this.data.topics, relatedId);
+                    const relatedTopic = findTopicByIdInProjects(this.data.projects, relatedId);
                     return relatedTopic ?
                         `<button class="related-topic-link" onclick="window.app.openTopicDetailModal('${relatedId}')">
                             ${escapeHtml(relatedTopic.title)}
@@ -819,10 +826,11 @@ class App {
         const resultsContainer = document.getElementById('ask-ai-results');
 
         // Show loading state
+        const totalTopics = this.data.projects.reduce((sum, p) => sum + p.topics.length, 0);
         resultsContainer.innerHTML = `
             <div class="ask-ai-loading">
                 <div class="ask-ai-loading-spinner"></div>
-                <p>Searching across all ${this.data.topics.length} conversations...</p>
+                <p>Searching across all ${totalTopics} conversations...</p>
             </div>
         `;
 
@@ -837,7 +845,10 @@ class App {
         const keywords = question.toLowerCase().split(' ').filter(w => w.length > 2);
         const results = [];
 
-        this.data.topics.forEach(topic => {
+        // Search across all projects
+        const allTopics = this.data.projects.flatMap(p => p.topics);
+
+        allTopics.forEach(topic => {
             let relevantExchanges = [];
             let score = 0;
 
@@ -967,7 +978,7 @@ class App {
     }
 
     previewMerge(topicIds) {
-        const topics = topicIds.map(id => findTopicById(this.data.topics, id)).filter(Boolean);
+        const topics = topicIds.map(id => findTopicByIdInProjects(this.data.projects, id)).filter(Boolean);
         if (topics.length < 2) return;
 
         // Create preview modal
