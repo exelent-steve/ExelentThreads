@@ -115,16 +115,16 @@ class TimelineView {
 
     getDesignVariant(index) {
         const variants = [
-            { shape: 'rounded-rect', style: 'solid-border', background: 'white' },
-            { shape: 'circle', style: 'double-border', background: 'linear-gradient(135deg, #fff 0%, #f9fafb 100%)' },
-            { shape: 'rounded-rect', style: 'dashed-border', background: 'white' },
-            { shape: 'soft-square', style: 'shadow-heavy', background: 'white' },
-            { shape: 'rounded-rect', style: 'gradient-border', background: 'white' },
-            { shape: 'pill', style: 'solid-border', background: 'linear-gradient(135deg, #fefefe 0%, #fafafa 100%)' },
-            { shape: 'hexagon', style: 'solid-border', background: 'white' },
-            { shape: 'rounded-rect', style: 'dotted-border', background: 'white' },
-            { shape: 'soft-square', style: 'double-border', background: 'white' },
-            { shape: 'circle', style: 'solid-border', background: 'white' }
+            { shape: 'rounded-rect', style: 'solid-border', background: '#1f2937' },
+            { shape: 'circle', style: 'double-border', background: 'linear-gradient(135deg, #1f2937 0%, #111827 100%)' },
+            { shape: 'rounded-rect', style: 'dashed-border', background: '#1f2937' },
+            { shape: 'soft-square', style: 'shadow-heavy', background: '#1f2937' },
+            { shape: 'rounded-rect', style: 'gradient-border', background: '#1f2937' },
+            { shape: 'pill', style: 'solid-border', background: 'linear-gradient(135deg, #1f2937 0%, #111827 100%)' },
+            { shape: 'hexagon', style: 'solid-border', background: '#1f2937' },
+            { shape: 'rounded-rect', style: 'dotted-border', background: '#1f2937' },
+            { shape: 'soft-square', style: 'double-border', background: '#1f2937' },
+            { shape: 'circle', style: 'solid-border', background: '#1f2937' }
         ];
         return variants[index % variants.length];
     }

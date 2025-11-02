@@ -259,7 +259,13 @@ body {
     border-radius: 8px;
     font-size: 0.875rem;
     font-family: inherit;
+    background: var(--bg-secondary);
+    color: var(--text-primary);
     transition: all 0.2s;
+}
+
+.global-search-input::placeholder {
+    color: var(--text-tertiary);
 }
 
 .global-search-input:focus {
@@ -345,10 +351,6 @@ body {
 }
 
 /* Main Container */
-.view-container {
-    height: calc(100vh - 130px);
-    overflow: hidden;
-}
 
 /* Search Modal */
 .search-modal {
@@ -580,7 +582,8 @@ body {
     width: 90%;
     max-width: 900px;
     max-height: 90vh;
-    background: white;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-light);
     border-radius: 12px;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
     display: flex;
@@ -684,12 +687,12 @@ body {
 }
 
 .modal-exchange.user {
-    background: #f0f9ff;
+    background: rgba(37, 99, 235, 0.1);
     border-left: 3px solid #2563eb;
 }
 
 .modal-exchange.claude {
-    background: #faf5ff;
+    background: rgba(124, 58, 237, 0.1);
     border-left: 3px solid #7c3aed;
 }
 
@@ -761,7 +764,13 @@ body {
     border-radius: 8px;
     font-size: 0.9375rem;
     font-family: inherit;
+    background: var(--bg-secondary);
+    color: var(--text-primary);
     transition: all 0.2s;
+}
+
+.ask-ai-input::placeholder {
+    color: var(--text-tertiary);
 }
 
 .ask-ai-input:focus {
@@ -867,8 +876,8 @@ body {
 }
 
 .ask-ai-result-card {
-    background: white;
-    border: 1px solid var(--border-light);
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-medium);
     border-radius: 8px;
     padding: 1.25rem;
     margin-bottom: 1rem;
@@ -876,8 +885,9 @@ body {
 }
 
 .ask-ai-result-card:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
     border-color: var(--primary-blue);
+    background: var(--bg-tertiary);
 }
 
 .ask-ai-result-header {
@@ -943,7 +953,7 @@ body {
 }
 
 .ask-ai-exchange.user {
-    background: #f0f9ff;
+    background: rgba(37, 99, 235, 0.1);
     border-left-color: #2563eb;
 }
 
@@ -1025,10 +1035,11 @@ body {
 .sort-select {
     width: 100%;
     padding: 0.5rem;
-    border: 1px solid var(--border-light);
+    border: 1px solid var(--border-medium);
     border-radius: 6px;
     font-size: 0.875rem;
-    background: white;
+    background: var(--bg-secondary);
+    color: var(--text-primary);
 }
 
 .topics-list {
@@ -1156,19 +1167,20 @@ body {
 }
 
 .related-topic-link {
-    background: white;
-    border: 1px solid #bfdbfe;
+    background: var(--bg-secondary);
+    border: 1px solid var(--primary-blue);
     border-radius: 4px;
     padding: 0.375rem 0.75rem;
     font-size: 0.75rem;
     cursor: pointer;
     transition: all 0.2s;
-    color: #1e40af;
+    color: var(--primary-blue);
 }
 
 .related-topic-link:hover {
-    background: #dbeafe;
-    border-color: #3b82f6;
+    background: var(--bg-tertiary);
+    border-color: var(--primary-blue-hover);
+    color: var(--primary-blue-hover);
 }
 
 .related-more {
@@ -1506,7 +1518,8 @@ body {
     border: 1px solid var(--border-medium);
     border-radius: 6px;
     font-size: 0.875rem;
-    background: white;
+    background: var(--bg-secondary);
+    color: var(--text-primary);
 }
 
 .table-container {
@@ -1691,11 +1704,11 @@ body {
 }
 
 .card-exchange.user {
-    background: #f0f9ff;
+    background: rgba(37, 99, 235, 0.1);
 }
 
 .card-exchange.claude {
-    background: #faf5ff;
+    background: rgba(124, 58, 237, 0.1);
 }
 
 .card-exchange-speaker {
@@ -2074,8 +2087,8 @@ body {
 }
 
 .merge-suggestion-card {
-    background: white;
-    border: 2px solid var(--border-light);
+    background: var(--bg-secondary);
+    border: 2px solid var(--border-medium);
     border-radius: 8px;
     padding: 1.25rem;
     transition: all 0.2s ease;
@@ -2083,7 +2096,8 @@ body {
 
 .merge-suggestion-card:hover {
     border-color: var(--primary-blue);
-    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+    background: var(--bg-tertiary);
 }
 
 .merge-header {
