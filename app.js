@@ -25,10 +25,10 @@ class App {
     }
 
     attachEventListeners() {
-        // View switcher tabs
-        document.querySelectorAll('.view-tab').forEach(tab => {
-            tab.addEventListener('click', (e) => {
-                const viewName = e.target.dataset.view;
+        // Sidebar navigation (updated for sidebar layout)
+        document.querySelectorAll('.sidebar-nav-item[data-view]').forEach(item => {
+            item.addEventListener('click', (e) => {
+                const viewName = e.currentTarget.dataset.view;
                 this.switchView(viewName);
             });
         });
@@ -203,18 +203,42 @@ class App {
 
     switchView(viewName) {
         this.currentView = viewName;
-        
-        // Update active tab
-        document.querySelectorAll('.view-tab').forEach(tab => {
-            tab.classList.remove('active');
+
+        // Update active sidebar item
+        document.querySelectorAll('.sidebar-nav-item[data-view]').forEach(item => {
+            item.classList.remove('active');
         });
-        const activeTab = document.querySelector(`.view-tab[data-view="${viewName}"]`);
-        if (activeTab) {
-            activeTab.classList.add('active');
+        const activeItem = document.querySelector(`.sidebar-nav-item[data-view="${viewName}"]`);
+        if (activeItem) {
+            activeItem.classList.add('active');
         }
-        
+
         // Render new view
-        this.views[viewName].render();
+        const view = this.views[viewName];
+        if (view) {
+            view.render();
+        } else {
+            // View not yet implemented (activity, health, team dashboards)
+            this.renderPlaceholder(viewName);
+        }
+    }
+
+    renderPlaceholder(viewName) {
+        const container = document.getElementById('view-container');
+        const titles = {
+            'activity': 'Activity Dashboard',
+            'health': 'Topic Health',
+            'team': 'Team Performance'
+        };
+        container.innerHTML = `
+            <div style="display: flex; align-items: center; justify-center; height: 100%; color: var(--text-secondary);">
+                <div style="text-align: center; padding: 2rem;">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">🚧</div>
+                    <h2 style="color: var(--text-primary); margin-bottom: 0.5rem;">${titles[viewName] || viewName}</h2>
+                    <p>This dashboard is coming soon!</p>
+                </div>
+            </div>
+        `;
     }
 
     handleAIInsights(button) {

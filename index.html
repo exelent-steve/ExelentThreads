@@ -7,25 +7,108 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <!-- Header -->
-    <header class="header">
-        <div class="header-left">
-            <h1 class="logo">🧵 ExelentThreads</h1>
-            <span class="project-name">Enterprise SaaS Platform</span>
-        </div>
-        <div class="header-center">
-            <div class="search-container">
-                <input type="text" id="global-search" class="global-search-input" placeholder="🔍 Search across all topics..." />
+    <!-- Main App Container -->
+    <div class="app-container">
+        <!-- Left Sidebar -->
+        <aside class="sidebar">
+            <!-- Logo -->
+            <div class="sidebar-header">
+                <a href="#" class="sidebar-logo">
+                    <span class="sidebar-logo-text">🧵 ExelentThreads</span>
+                </a>
             </div>
+
+            <!-- New Topic Button -->
+            <div class="sidebar-new-topic">
+                <button id="new-topic-btn" class="btn">
+                    <span>+</span>
+                    <span>New Topic</span>
+                </button>
+            </div>
+
+            <!-- Navigation -->
+            <div class="sidebar-content">
+                <!-- Conversations Section -->
+                <div class="sidebar-section">
+                    <div class="sidebar-section-title">Conversations</div>
+                    <nav class="sidebar-nav">
+                        <button class="sidebar-nav-item active" data-view="conversation">
+                            <span class="sidebar-nav-icon">💬</span>
+                            <span>Conversation</span>
+                        </button>
+                        <button class="sidebar-nav-item" data-view="table">
+                            <span class="sidebar-nav-icon">📊</span>
+                            <span>Table</span>
+                        </button>
+                        <button class="sidebar-nav-item" data-view="board">
+                            <span class="sidebar-nav-icon">📋</span>
+                            <span>Board</span>
+                        </button>
+                        <button class="sidebar-nav-item" data-view="timeline">
+                            <span class="sidebar-nav-icon">📅</span>
+                            <span>Timeline</span>
+                        </button>
+                    </nav>
+                </div>
+
+                <!-- Dashboards Section -->
+                <div class="sidebar-section">
+                    <div class="sidebar-section-title">Dashboards</div>
+                    <nav class="sidebar-nav">
+                        <button class="sidebar-nav-item" data-view="activity">
+                            <span class="sidebar-nav-icon">🔥</span>
+                            <span>Activity Dashboard</span>
+                        </button>
+                        <button class="sidebar-nav-item" data-view="health">
+                            <span class="sidebar-nav-icon">🏥</span>
+                            <span>Topic Health</span>
+                        </button>
+                        <button class="sidebar-nav-item" data-view="team">
+                            <span class="sidebar-nav-icon">👥</span>
+                            <span>Team Performance</span>
+                        </button>
+                        <button class="sidebar-nav-item" data-view="analytics">
+                            <span class="sidebar-nav-icon">🧠</span>
+                            <span>Decision Intelligence</span>
+                        </button>
+                    </nav>
+                </div>
+            </div>
+
+            <!-- Footer Actions -->
+            <div class="sidebar-footer">
+                <nav class="sidebar-nav">
+                    <button id="help-btn" class="sidebar-nav-item">
+                        <span class="sidebar-nav-icon">❓</span>
+                        <span>Help</span>
+                    </button>
+                    <button id="ask-ai-btn" class="sidebar-nav-item">
+                        <span class="sidebar-nav-icon">🔮</span>
+                        <span>Ask AI</span>
+                    </button>
+                    <button id="export-btn" class="sidebar-nav-item">
+                        <span class="sidebar-nav-icon">↓</span>
+                        <span>Export</span>
+                    </button>
+                </nav>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Search Bar (moved here) -->
+            <div class="content-header">
+                <div class="search-container">
+                    <input type="text" id="global-search" class="global-search-input" placeholder="🔍 Search across all topics..." />
+                </div>
+            </div>
+
+            <!-- View Container -->
+            <main id="view-container" class="view-container">
+                <!-- Active view renders here -->
+            </main>
         </div>
-        <div class="header-right">
-            <button id="ask-ai-btn" class="btn btn-primary">🔮 Ask AI Anything</button>
-            <button id="help-btn" class="btn btn-secondary">❓ Help</button>
-            <button id="ai-insights-btn" class="btn btn-secondary">📊 Insights</button>
-            <button id="new-topic-btn" class="btn btn-secondary">+ New Topic</button>
-            <button id="export-btn" class="btn btn-secondary">↓ Export</button>
-        </div>
-    </header>
+    </div>
 
     <!-- Help Modal -->
     <div id="help-modal" class="search-modal hidden">
@@ -167,20 +250,6 @@
             </div>
         </div>
     </div>
-
-    <!-- View Switcher -->
-    <nav class="view-switcher">
-        <button class="view-tab active" data-view="conversation">💬 Conversation</button>
-        <button class="view-tab" data-view="table">📊 Table</button>
-        <button class="view-tab" data-view="board">📋 Board</button>
-        <button class="view-tab" data-view="timeline">📅 Timeline</button>
-        <button class="view-tab" data-view="analytics">📈 Analytics</button>
-    </nav>
-
-    <!-- Main Content Area -->
-    <main id="view-container" class="view-container">
-        <!-- Active view renders here -->
-    </main>
 
     <!-- Toast Container -->
     <div id="toast-container" class="toast-container"></div>
