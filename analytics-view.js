@@ -387,7 +387,7 @@ class AnalyticsView {
                 const compareTopic = this.data.topics[j];
                 const similarity = this.calculateTopicSimilarity(baseTopic, compareTopic);
 
-                if (similarity >= 60) { // 60% threshold for merge suggestion
+                if (similarity >= 50) { // 50% threshold for merge suggestion
                     similarTopics.push(compareTopic);
                     processed.add(compareTopic.id);
                 }
@@ -409,33 +409,45 @@ class AnalyticsView {
     calculateTopicSimilarity(topic1, topic2) {
         let score = 0;
 
-        // Category match (30 points)
-        if (topic1.category && topic2.category && topic1.category === topic2.category) {
-            score += 30;
+        // Explicitly related topics bonus (25 points)
+        if (topic1.relatedTopics && topic1.relatedTopics.includes(topic2.id)) {
+            score += 25;
+        }
+        if (topic2.relatedTopics && topic2.relatedTopics.includes(topic1.id)) {
+            score += 25;
         }
 
-        // Title similarity (40 points max)
+        // Category match (25 points)
+        if (topic1.category && topic2.category && topic1.category === topic2.category) {
+            score += 25;
+        }
+
+        // Title similarity (30 points max)
         const title1Words = topic1.title.toLowerCase().split(/\s+/).filter(w => w.length > 3);
         const title2Words = topic2.title.toLowerCase().split(/\s+/).filter(w => w.length > 3);
         const titleOverlap = title1Words.filter(w => title2Words.includes(w)).length;
-        const titleScore = (titleOverlap / Math.max(title1Words.length, title2Words.length)) * 40;
-        score += titleScore;
+        if (titleOverlap > 0) {
+            const titleScore = (titleOverlap / Math.max(title1Words.length, title2Words.length)) * 30;
+            score += titleScore;
+        }
 
-        // Content similarity (30 points max)
+        // Content similarity (20 points max)
         const content1 = topic1.exchanges.map(e => e.content.toLowerCase()).join(' ');
         const content2 = topic2.exchanges.map(e => e.content.toLowerCase()).join(' ');
 
-        // Extract significant words (>4 chars, not common words)
-        const commonWords = ['this', 'that', 'with', 'from', 'have', 'will', 'would', 'should', 'could', 'their', 'there', 'what', 'when', 'where', 'which'];
-        const words1 = content1.split(/\s+/).filter(w => w.length > 4 && !commonWords.includes(w));
-        const words2 = content2.split(/\s+/).filter(w => w.length > 4 && !commonWords.includes(w));
+        // Extract significant words (>3 chars, not common words)
+        const commonWords = ['this', 'that', 'with', 'from', 'have', 'will', 'would', 'should', 'could', 'their', 'there', 'what', 'when', 'where', 'which', 'about', 'them', 'these', 'those'];
+        const words1 = content1.split(/\s+/).filter(w => w.length > 3 && !commonWords.includes(w));
+        const words2 = content2.split(/\s+/).filter(w => w.length > 3 && !commonWords.includes(w));
 
         // Count shared significant words
-        const uniqueWords1 = [...new Set(words1)].slice(0, 20); // Top 20 unique words
-        const uniqueWords2 = [...new Set(words2)].slice(0, 20);
+        const uniqueWords1 = [...new Set(words1)].slice(0, 30); // Top 30 unique words
+        const uniqueWords2 = [...new Set(words2)].slice(0, 30);
         const contentOverlap = uniqueWords1.filter(w => uniqueWords2.includes(w)).length;
-        const contentScore = (contentOverlap / Math.max(uniqueWords1.length, uniqueWords2.length)) * 30;
-        score += contentScore;
+        if (contentOverlap > 0) {
+            const contentScore = Math.min(20, (contentOverlap / 5) * 10); // Up to 20 points
+            score += contentScore;
+        }
 
         return Math.round(score);
     }
