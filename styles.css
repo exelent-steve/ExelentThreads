@@ -4864,6 +4864,26 @@ body {
     overflow-y: auto;
 }
 
+/* Force scrollbar to always be visible */
+.timeline-topics-list::-webkit-scrollbar {
+    width: 12px;
+}
+
+.timeline-topics-list::-webkit-scrollbar-track {
+    background: var(--bg-secondary);
+    border-radius: 0 0.5rem 0.5rem 0;
+}
+
+.timeline-topics-list::-webkit-scrollbar-thumb {
+    background: var(--border-strong);
+    border-radius: 6px;
+    border: 2px solid var(--bg-secondary);
+}
+
+.timeline-topics-list::-webkit-scrollbar-thumb:hover {
+    background: var(--text-tertiary);
+}
+
 .timeline-topic-item {
     padding: 1rem;
     border-bottom: 1px solid var(--border-light);
@@ -4917,11 +4937,6 @@ body {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-}
-
-.timeline-topic-actions {
-    display: flex;
-    gap: 0.5rem;
 }
 
 .timeline-empty-state {

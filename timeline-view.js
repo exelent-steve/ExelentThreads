@@ -253,29 +253,15 @@ class TimelineView {
                         <div class="timeline-topic-meta">${daysAgo}d ago • ${topic.status} • ${topic.exchanges.length} exchanges</div>
                         <div class="timeline-topic-snippet">${escapeHtml(topic.exchanges[topic.exchanges.length - 1]?.content || 'No exchanges yet')}</div>
                     </div>
-                    <div class="timeline-topic-actions">
-                        <button class="btn btn-primary btn-view-topic" data-topic-id="${topic.id}">
-                            👁️ View Details
-                        </button>
-                    </div>
                 </div>
             `;
         }).join('');
 
-        // Add click handlers
+        // Add click handlers - clicking anywhere on topic opens modal
         listContainer.querySelectorAll('.timeline-topic-item').forEach(item => {
-            item.addEventListener('click', (e) => {
-                if (!e.target.closest('.btn')) {
-                    const topicId = item.dataset.topicId;
-                    this.selectTopic(topicId);
-                }
-            });
-        });
-
-        listContainer.querySelectorAll('.btn-view-topic').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const topicId = btn.dataset.topicId;
+            item.addEventListener('click', () => {
+                const topicId = item.dataset.topicId;
+                this.selectTopic(topicId);
                 window.app.openTopicDetailModal(topicId);
             });
         });
