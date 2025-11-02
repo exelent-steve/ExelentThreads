@@ -64,21 +64,33 @@ ExelentThreads captures every AI conversation across your organization and trans
 
 ### Core Conversation Management
 
-**1. Multiple View Types**
+**1. Projects Hierarchy** 📁 NEW
+- **Project Organization** - Group related topics into projects (e.g., "E-commerce Redesign", "Mobile App")
+- **Project Switching** - Dropdown selector in sidebar to switch between projects
+- **Project Management** - Create, edit, and archive projects from dedicated management interface
+- **Project Sharing** - Share entire projects with colleagues via link or team invitation
+  - Permission levels: Can view, Can edit, Can admin
+  - Shareable links with project-level access control
+- **Smart Scoping**:
+  - Conversation/Table/Board/Timeline views show CURRENT PROJECT only
+  - Dashboards and Analytics show ALL PROJECTS (org-wide insights)
+  - Global search, Ask AI, and Smart Suggestions work across all projects
+
+**2. Multiple View Types**
 - **Conversation View** - Chat-style interface with sidebar, message history
-- **Table View** - Spreadsheet-style CSV table for bulk analysis
+- **Table View** - Spreadsheet-style CSV table with dark theme for bulk analysis
 - **Board View** - Kanban-style cards grouped by status
 - **Timeline View** - Visual cascading waterfall of topics over time
 
-**2. Smart Suggestions**
+**3. Smart Suggestions**
 - Auto-suggests related topics as users type
 - Confidence scoring (High 70%+, Medium 40-69%, Low <40%)
 - Shows past decisions and solutions
 - One-click to copy previous solutions
 
-**3. Universal Functionality**
+**4. Universal Functionality**
 - Add comments in ANY view (conversation, table, board, timeline, modals)
-- Search across all topics globally
+- Search across all topics globally (across all projects)
 - Keyboard shortcuts (Escape to close modals, arrow keys for navigation)
 
 ### Intelligence & Analytics

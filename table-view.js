@@ -108,20 +108,20 @@ class TableView {
             for (let i = 0; i < maxExchanges; i++) {
                 const exchange = topic.exchanges[i];
                 if (exchange) {
-                    const bgColor = exchange.speaker === 'user' ? '#f0f9ff' : '#faf5ff';
+                    const bgColor = exchange.speaker === 'user' ? 'rgba(37, 99, 235, 0.08)' : 'rgba(124, 58, 237, 0.08)';
                     rowHtml += `
                         <td class="csv-cell" style="background: ${bgColor}; vertical-align: top;">
                             ${escapeHtml(exchange.content)}
                         </td>
                     `;
                 } else {
-                    rowHtml += `<td class="csv-cell" style="background: #fafafa;"></td>`;
+                    rowHtml += `<td class="csv-cell"></td>`;
                 }
             }
-            
+
             // Add comment input cell
             rowHtml += `
-                <td class="csv-cell" style="background: white; vertical-align: top;">
+                <td class="csv-cell" style="vertical-align: top;">
                     <div class="comment-input-wrapper">
                         <input type="text"
                                class="comment-input"
@@ -134,7 +134,7 @@ class TableView {
 
             // Add view details button cell
             rowHtml += `
-                <td class="csv-cell" style="background: white; vertical-align: top; text-align: center;">
+                <td class="csv-cell" style="vertical-align: top; text-align: center;">
                     <button class="btn-view-details btn btn-secondary"
                             data-topic-id="${topic.id}"
                             style="font-size: 0.875rem; padding: 0.5rem 0.75rem; white-space: nowrap;">

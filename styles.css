@@ -4491,6 +4491,78 @@ body {
     color: var(--text-primary);
 }
 
+/* Manage Projects Modal */
+.manage-projects-section {
+    padding: 1rem 0;
+}
+
+.manage-projects-description {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    margin-bottom: 1.5rem;
+}
+
+.projects-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.manage-project-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-medium);
+    border-radius: 0.5rem;
+    gap: 1rem;
+}
+
+.manage-project-info {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex: 1;
+    min-width: 0;
+}
+
+.manage-project-details {
+    flex: 1;
+    min-width: 0;
+}
+
+.manage-project-name {
+    font-weight: 600;
+    font-size: 0.9375rem;
+    color: var(--text-primary);
+    margin-bottom: 0.25rem;
+}
+
+.manage-project-desc {
+    font-size: 0.8125rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.25rem;
+}
+
+.manage-project-meta {
+    font-size: 0.75rem;
+    color: var(--text-tertiary);
+}
+
+.manage-project-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.manage-projects-footer {
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-medium);
+    display: flex;
+    justify-content: center;
+}
+
 /* Scrollbar Styling */
 ::-webkit-scrollbar {
     width: 8px;

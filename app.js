@@ -126,6 +126,14 @@ class App {
             });
         }
 
+        // Manage Projects button
+        const manageProjectsBtn = document.getElementById('manage-projects-btn');
+        if (manageProjectsBtn) {
+            manageProjectsBtn.addEventListener('click', () => {
+                this.openManageProjectsModal();
+            });
+        }
+
         // Settings button
         const settingsBtn = document.getElementById('settings-btn');
         if (settingsBtn) {
@@ -1061,12 +1069,6 @@ class App {
                         <div class="project-menu-name">New Project</div>
                     </div>
                 </div>
-                <div class="project-menu-item">
-                    <span>⚙️</span>
-                    <div class="project-menu-info">
-                        <div class="project-menu-name">Manage Projects</div>
-                    </div>
-                </div>
             `;
 
             // Attach click handlers to project items
@@ -1082,15 +1084,6 @@ class App {
                 showToast('📁 New Project: Create a new project to organize your topics');
                 dropdownMenu.classList.add('hidden');
             });
-
-            // Handle manage projects
-            const manageItem = dropdownMenu.querySelectorAll('.project-menu-item')[this.data.projects.length + 1];
-            if (manageItem) {
-                manageItem.addEventListener('click', () => {
-                    showToast('⚙️ Manage Projects: Edit, archive, or delete projects');
-                    dropdownMenu.classList.add('hidden');
-                });
-            }
         }
 
         // Toggle dropdown on button click
@@ -1191,6 +1184,56 @@ class App {
 
         // Close handler
         const closeBtn = document.getElementById('share-modal-close');
+        if (closeBtn) {
+            closeBtn.addEventListener('click', () => {
+                modal.classList.add('hidden');
+            });
+        }
+
+        modal.addEventListener('click', (e) => {
+            if (e.target.classList.contains('search-modal-backdrop') || e.target.classList.contains('search-modal')) {
+                modal.classList.add('hidden');
+            }
+        });
+    }
+
+    openManageProjectsModal() {
+        const modal = document.getElementById('manage-projects-modal');
+        const content = document.getElementById('manage-projects-content');
+
+        content.innerHTML = `
+            <div class="manage-projects-section">
+                <p class="manage-projects-description">Create, edit, and organize your projects</p>
+                <div class="projects-list">
+                    ${this.data.projects.map(p => `
+                        <div class="manage-project-item">
+                            <div class="manage-project-info">
+                                <span class="project-color-dot" style="background: ${p.color}"></span>
+                                <div class="manage-project-details">
+                                    <div class="manage-project-name">${p.name}</div>
+                                    <div class="manage-project-desc">${p.description}</div>
+                                    <div class="manage-project-meta">${p.topics.length} topics • Updated ${formatRelativeTime(p.updated)}</div>
+                                </div>
+                            </div>
+                            <div class="manage-project-actions">
+                                <button class="btn btn-small" onclick="showToast('✏️ Edit project: ${p.name}')">Edit</button>
+                                <button class="btn btn-small" onclick="showToast('🗑️ Archive project: ${p.name}')">Archive</button>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+                <div class="manage-projects-footer">
+                    <button class="btn btn-primary" onclick="showToast('📁 Create new project')">
+                        ➕ Create New Project
+                    </button>
+                </div>
+            </div>
+        `;
+
+        modal.classList.remove('hidden');
+
+        // Close handler
+        const closeBtn = document.getElementById('manage-projects-close');
         if (closeBtn) {
             closeBtn.addEventListener('click', () => {
                 modal.classList.add('hidden');
