@@ -4189,6 +4189,64 @@ body {
     color: var(--text-secondary);
 }
 
+/* Department Patterns Grid (Analytics View) */
+.dept-patterns-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.dept-pattern-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-medium);
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    transition: all 0.2s;
+}
+
+.dept-pattern-card:hover {
+    border-color: var(--primary-blue);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.1);
+}
+
+.dept-pattern-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid var(--border-medium);
+}
+
+.dept-pattern-header h4 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.dept-pattern-count {
+    font-size: 0.875rem;
+    color: var(--text-tertiary);
+    background: var(--bg-tertiary);
+    padding: 0.25rem 0.75rem;
+    border-radius: 1rem;
+}
+
+.dept-pattern-insights {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.dept-insight-item {
+    font-size: 0.9375rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    padding-left: 0.5rem;
+}
+
 /* Scrollbar Styling */
 ::-webkit-scrollbar {
     width: 8px;

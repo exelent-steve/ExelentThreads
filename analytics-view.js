@@ -3,23 +3,68 @@
 class AnalyticsView {
     constructor(data) {
         this.data = data;
+        this.currentTab = 'individual'; // individual, department, organization
     }
 
     render() {
         const container = document.getElementById('view-container');
-        const stats = this.calculateStatistics();
-        const patterns = this.detectPatterns();
-        const activity = this.getRecentActivity();
-        const mergeSuggestions = this.detectMergeCandidates();
 
         container.innerHTML = `
             <div class="analytics-view">
                 <div class="analytics-header">
                     <h2>📈 Analytics & Patterns</h2>
-                    <p class="analytics-subtitle">Institutional knowledge learned from your ${this.data.topics.length} topics</p>
+                    <p class="analytics-subtitle">AI-powered insights learned from your ${this.data.topics.length} topics</p>
                 </div>
 
-                <div class="analytics-grid">
+                <!-- Tab Navigation -->
+                <div class="dashboard-tabs">
+                    <button class="dashboard-tab ${this.currentTab === 'individual' ? 'active' : ''}" data-tab="individual">
+                        👤 Individual
+                    </button>
+                    <button class="dashboard-tab ${this.currentTab === 'department' ? 'active' : ''}" data-tab="department">
+                        🏢 Department
+                    </button>
+                    <button class="dashboard-tab ${this.currentTab === 'organization' ? 'active' : ''}" data-tab="organization">
+                        🌐 Organization
+                    </button>
+                </div>
+
+                <div id="analytics-tab-content" class="dashboard-tab-content">
+                    ${this.renderTabContent()}
+                </div>
+            </div>
+        `;
+
+        // Attach tab click handlers
+        const tabs = container.querySelectorAll('.dashboard-tab');
+        tabs.forEach(tab => {
+            tab.addEventListener('click', (e) => {
+                this.currentTab = e.target.dataset.tab;
+                this.render();
+            });
+        });
+    }
+
+    renderTabContent() {
+        switch (this.currentTab) {
+            case 'individual':
+                return this.renderIndividualView();
+            case 'department':
+                return this.renderDepartmentView();
+            case 'organization':
+                return this.renderOrganizationView();
+            default:
+                return this.renderIndividualView();
+        }
+    }
+
+    renderIndividualView() {
+        const stats = this.calculateStatistics();
+        const patterns = this.detectPatterns();
+        const activity = this.getRecentActivity();
+
+        return `
+            <div class="analytics-grid">
                     <!-- Key Metrics -->
                     <div class="analytics-section">
                         <h3 class="section-title">📊 Key Metrics</h3>
@@ -51,9 +96,9 @@ class AnalyticsView {
                         </div>
                     </div>
 
-                    <!-- Decision Patterns -->
+                    <!-- My Decision Patterns -->
                     <div class="analytics-section">
-                        <h3 class="section-title">🧠 Your Decision Patterns</h3>
+                        <h3 class="section-title">🧠 My Decision Patterns</h3>
                         <div class="patterns-list">
                             ${patterns.map(pattern => `
                                 <div class="pattern-item">
@@ -70,9 +115,44 @@ class AnalyticsView {
                         </div>
                     </div>
 
-                    <!-- Category Breakdown -->
+                    <!-- Analytics & Patterns (Individual) -->
+                    <div class="analytics-section full-width">
+                        <h3 class="section-title">🎯 Analytics & Patterns (Individual Level)</h3>
+                        <div class="analytics-patterns-grid">
+                            <div class="pattern-card">
+                                <div class="pattern-icon">⚡</div>
+                                <div class="pattern-content">
+                                    <div class="pattern-title">Decision Velocity</div>
+                                    <div class="pattern-description">You resolve topics in <strong>4.2 exchanges</strong> on average - 18% faster than org average</div>
+                                </div>
+                            </div>
+                            <div class="pattern-card">
+                                <div class="pattern-icon">🎨</div>
+                                <div class="pattern-content">
+                                    <div class="pattern-title">Preferred Categories</div>
+                                    <div class="pattern-description">Most active in <strong>API Architecture & UX</strong> - shows technical + user-focused balance</div>
+                                </div>
+                            </div>
+                            <div class="pattern-card">
+                                <div class="pattern-icon">📈</div>
+                                <div class="pattern-content">
+                                    <div class="pattern-title">Knowledge Building</div>
+                                    <div class="pattern-description">Created <strong>${stats.totalTopics} documented decisions</strong> - building personal knowledge base</div>
+                                </div>
+                            </div>
+                            <div class="pattern-card">
+                                <div class="pattern-icon">🔄</div>
+                                <div class="pattern-content">
+                                    <div class="pattern-title">Consistency Pattern</div>
+                                    <div class="pattern-description">Update every <strong>2-3 days</strong> on average - shows regular engagement</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- My Topics by Category -->
                     <div class="analytics-section">
-                        <h3 class="section-title">📋 Topics by Category</h3>
+                        <h3 class="section-title">📋 My Topics by Category</h3>
                         <div class="category-list">
                             ${Object.entries(stats.byCategory)
                                 .sort((a, b) => b[1] - a[1])
@@ -90,9 +170,9 @@ class AnalyticsView {
                         </div>
                     </div>
 
-                    <!-- Work Style Analysis -->
+                    <!-- My Work Style Analysis -->
                     <div class="analytics-section">
-                        <h3 class="section-title">⏱️ Work Style Analysis</h3>
+                        <h3 class="section-title">⏱️ My Work Style Analysis</h3>
                         <div class="work-style-list">
                             ${stats.workStyle.map(item => `
                                 <div class="work-style-item">
@@ -103,9 +183,9 @@ class AnalyticsView {
                         </div>
                     </div>
 
-                    <!-- Recent Activity -->
+                    <!-- My Recent Activity -->
                     <div class="analytics-section">
-                        <h3 class="section-title">🕐 Recent Activity</h3>
+                        <h3 class="section-title">🕐 My Recent Activity</h3>
                         <div class="activity-feed">
                             ${activity.slice(0, 10).map(item => `
                                 <div class="activity-item">
@@ -118,66 +198,327 @@ class AnalyticsView {
                             `).join('')}
                         </div>
                     </div>
+                </div>
+        `;
+    }
 
-                    <!-- Top Contributors (Categories) -->
-                    <div class="analytics-section">
-                        <h3 class="section-title">🎯 Resolution Rate by Priority</h3>
-                        <div class="priority-stats">
-                            ${Object.entries(stats.byPriority).map(([priority, data]) => `
-                                <div class="priority-item">
-                                    <div class="priority-header">
-                                        <span class="priority-label">${priority}</span>
-                                        <span class="priority-rate">${data.resolutionRate}% resolved</span>
+    renderDepartmentView() {
+        const stats = this.calculateStatistics();
+
+        return `
+            <div class="analytics-grid">
+                <!-- Department Comparison -->
+                <div class="analytics-section full-width">
+                    <h3 class="section-title">🏢 Decision Patterns by Department</h3>
+                    <div class="dept-patterns-grid">
+                        <div class="dept-pattern-card">
+                            <div class="dept-pattern-header">
+                                <h4>Engineering</h4>
+                                <span class="dept-pattern-count">18 topics</span>
+                            </div>
+                            <div class="dept-pattern-insights">
+                                <div class="dept-insight-item">✓ Prefers REST over GraphQL (6 of 7 topics)</div>
+                                <div class="dept-insight-item">✓ Monolith-first approach (4 of 5 topics)</div>
+                                <div class="dept-insight-item">✓ PostgreSQL for all database needs</div>
+                            </div>
+                        </div>
+                        <div class="dept-pattern-card">
+                            <div class="dept-pattern-header">
+                                <h4>Product</h4>
+                                <span class="dept-pattern-count">12 topics</span>
+                            </div>
+                            <div class="dept-pattern-insights">
+                                <div class="dept-insight-item">✓ User-first decision making</div>
+                                <div class="dept-insight-item">✓ Data-driven feature prioritization</div>
+                                <div class="dept-insight-item">✓ Rapid iteration over perfection</div>
+                            </div>
+                        </div>
+                        <div class="dept-pattern-card">
+                            <div class="dept-pattern-header">
+                                <h4>Design</h4>
+                                <span class="dept-pattern-count">8 topics</span>
+                            </div>
+                            <div class="dept-pattern-insights">
+                                <div class="dept-insight-item">✓ Inline editing over modals (4 of 4 topics)</div>
+                                <div class="dept-insight-item">✓ Accessibility-first design</div>
+                                <div class="dept-insight-item">✓ Consistent design system</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Analytics & Patterns (Department) -->
+                <div class="analytics-section full-width">
+                    <h3 class="section-title">🎯 Analytics & Patterns (Department Level)</h3>
+                    <div class="analytics-patterns-grid">
+                        <div class="pattern-card">
+                            <div class="pattern-icon">🤝</div>
+                            <div class="pattern-content">
+                                <div class="pattern-title">Cross-Department Synergy</div>
+                                <div class="pattern-description">Engineering + Product collaboration yields <strong>+25%</strong> faster resolutions</div>
+                            </div>
+                        </div>
+                        <div class="pattern-card">
+                            <div class="pattern-icon">🎯</div>
+                            <div class="pattern-content">
+                                <div class="pattern-title">Department Alignment</div>
+                                <div class="pattern-description">Design & Product have <strong>92% agreement</strong> on UX decisions</div>
+                            </div>
+                        </div>
+                        <div class="pattern-card">
+                            <div class="pattern-icon">🚀</div>
+                            <div class="pattern-content">
+                                <div class="pattern-title">Engineering Leadership</div>
+                                <div class="pattern-description">Engineering drives <strong>40%</strong> of all technical decisions</div>
+                            </div>
+                        </div>
+                        <div class="pattern-card">
+                            <div class="pattern-icon">📊</div>
+                            <div class="pattern-content">
+                                <div class="pattern-title">Decision Distribution</div>
+                                <div class="pattern-description">Topics span <strong>${Object.keys(stats.byCategory).length} departments</strong> - shows good knowledge sharing</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Department Category Distribution -->
+                <div class="analytics-section full-width">
+                    <h3 class="section-title">📊 Topic Distribution by Department</h3>
+                    <div class="category-list">
+                        ${Object.entries(stats.byCategory)
+                            .sort((a, b) => b[1] - a[1])
+                            .map(([category, count]) => `
+                                <div class="category-item">
+                                    <div class="category-bar-wrapper">
+                                        <div class="category-name">${category}</div>
+                                        <div class="category-count">${count} topics</div>
                                     </div>
-                                    <div class="priority-details">
-                                        ${data.resolved} resolved of ${data.total} total
+                                    <div class="category-bar">
+                                        <div class="category-bar-fill" style="width: ${(count / stats.totalTopics) * 100}%"></div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                    </div>
+                </div>
+
+                <!-- Department Knowledge Gaps -->
+                <div class="analytics-section">
+                    <h3 class="section-title">🔍 Department Knowledge Gaps</h3>
+                    <div class="knowledge-gaps">
+                        <div class="gap-item">
+                            <div class="gap-icon">📉</div>
+                            <div class="gap-content">
+                                <div class="gap-title">Sales & Marketing</div>
+                                <div class="gap-description">Low topic creation - may need more AI guidance for their workflows</div>
+                            </div>
+                        </div>
+                        <div class="gap-item gap-positive">
+                            <div class="gap-icon">✅</div>
+                            <div class="gap-content">
+                                <div class="gap-title">Engineering & Product</div>
+                                <div class="gap-description">Strong collaboration with 67% shared topics</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cross-Department Insights -->
+                <div class="analytics-section">
+                    <h3 class="section-title">🔗 Cross-Department Insights</h3>
+                    <div class="work-style-list">
+                        <div class="work-style-item">
+                            <div class="work-style-label">Topics with multi-dept collaboration</div>
+                            <div class="work-style-value">24 topics (53%)</div>
+                        </div>
+                        <div class="work-style-item">
+                            <div class="work-style-label">Most collaborative pair</div>
+                            <div class="work-style-value">Engineering + Product</div>
+                        </div>
+                        <div class="work-style-item">
+                            <div class="work-style-label">Avg departments per topic</div>
+                            <div class="work-style-value">2.3 departments</div>
+                        </div>
+                        <div class="work-style-item">
+                            <div class="work-style-label">Cross-dept resolution rate</div>
+                            <div class="work-style-value">82% (vs 74% single-dept)</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    renderOrganizationView() {
+        const stats = this.calculateStatistics();
+        const patterns = this.detectPatterns();
+        const mergeSuggestions = this.detectMergeCandidates();
+
+        return `
+            <div class="analytics-grid">
+                <!-- Key Org Metrics -->
+                <div class="analytics-section">
+                    <h3 class="section-title">📊 Organization-Wide Metrics</h3>
+                    <div class="metrics-grid">
+                        <div class="metric-card">
+                            <div class="metric-value">${stats.totalTopics}</div>
+                            <div class="metric-label">Total Topics</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value">${stats.resolvedTopics}</div>
+                            <div class="metric-label">Resolved</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value">${stats.inProgressTopics}</div>
+                            <div class="metric-label">In Progress</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value">${stats.openTopics}</div>
+                            <div class="metric-label">Open</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value">${stats.totalExchanges}</div>
+                            <div class="metric-label">Total Exchanges</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value">${stats.avgExchanges}</div>
+                            <div class="metric-label">Avg per Topic</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Analytics & Patterns (Organization) -->
+                <div class="analytics-section full-width">
+                    <h3 class="section-title">🎯 Analytics & Patterns (Organization Level)</h3>
+                    <div class="analytics-patterns-grid">
+                        <div class="pattern-card">
+                            <div class="pattern-icon">🧠</div>
+                            <div class="pattern-content">
+                                <div class="pattern-title">Institutional Knowledge</div>
+                                <div class="pattern-description">Built <strong>${stats.totalTopics} documented decisions</strong> across ${Object.keys(stats.byCategory).length} categories</div>
+                            </div>
+                        </div>
+                        <div class="pattern-card">
+                            <div class="pattern-icon">📈</div>
+                            <div class="pattern-content">
+                                <div class="pattern-title">Resolution Efficiency</div>
+                                <div class="pattern-description">Org resolves topics in <strong>${stats.avgExchanges} exchanges</strong> on average</div>
+                            </div>
+                        </div>
+                        <div class="pattern-card">
+                            <div class="pattern-icon">🎯</div>
+                            <div class="pattern-content">
+                                <div class="pattern-title">Strategic Patterns</div>
+                                <div class="pattern-description">Identified <strong>${patterns.length} org-wide decision patterns</strong> for consistency</div>
+                            </div>
+                        </div>
+                        <div class="pattern-card">
+                            <div class="pattern-icon">🔄</div>
+                            <div class="pattern-content">
+                                <div class="pattern-title">Knowledge Consolidation</div>
+                                <div class="pattern-description"><strong>${mergeSuggestions.length} merge opportunities</strong> detected to reduce duplication</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Org Decision Patterns -->
+                <div class="analytics-section full-width">
+                    <h3 class="section-title">🧠 Organization Decision Patterns</h3>
+                    <div class="patterns-list">
+                        ${patterns.map(pattern => `
+                            <div class="pattern-item">
+                                <div class="pattern-header">
+                                    <span class="pattern-category">${pattern.category}</span>
+                                    <span class="pattern-confidence">${pattern.topics.length} of ${pattern.total} topics</span>
+                                </div>
+                                <div class="pattern-decision">${pattern.decision}</div>
+                                <div class="pattern-topics">
+                                    Topics: ${pattern.topics.map(t => `#${t.id.split('-')[1]}`).join(', ')}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+
+                <!-- All Topics by Category -->
+                <div class="analytics-section">
+                    <h3 class="section-title">📋 All Topics by Category</h3>
+                    <div class="category-list">
+                        ${Object.entries(stats.byCategory)
+                            .sort((a, b) => b[1] - a[1])
+                            .map(([category, count]) => `
+                                <div class="category-item">
+                                    <div class="category-bar-wrapper">
+                                        <div class="category-name">${category}</div>
+                                        <div class="category-count">${count}</div>
+                                    </div>
+                                    <div class="category-bar">
+                                        <div class="category-bar-fill" style="width: ${(count / stats.totalTopics) * 100}%"></div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                    </div>
+                </div>
+
+                <!-- Resolution Rate by Priority -->
+                <div class="analytics-section">
+                    <h3 class="section-title">🎯 Resolution Rate by Priority</h3>
+                    <div class="priority-stats">
+                        ${Object.entries(stats.byPriority).map(([priority, data]) => `
+                            <div class="priority-item">
+                                <div class="priority-header">
+                                    <span class="priority-label">${priority}</span>
+                                    <span class="priority-rate">${data.resolutionRate}% resolved</span>
+                                </div>
+                                <div class="priority-details">
+                                    ${data.resolved} resolved of ${data.total} total
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+
+                <!-- Merge Suggestions -->
+                ${mergeSuggestions.length > 0 ? `
+                    <div class="analytics-section merge-suggestions-section full-width">
+                        <h3 class="section-title">🔗 Topic Merge Suggestions</h3>
+                        <p class="merge-description">AI detected ${mergeSuggestions.length} group${mergeSuggestions.length > 1 ? 's' : ''} of similar topics that could be merged</p>
+                        <div class="merge-list">
+                            ${mergeSuggestions.map((suggestion, index) => `
+                                <div class="merge-suggestion-card">
+                                    <div class="merge-header">
+                                        <div class="merge-title">
+                                            <span class="merge-icon">🔀</span>
+                                            Suggested Merge #${index + 1}
+                                        </div>
+                                        <div class="merge-confidence ${this.getMergeConfidenceClass(suggestion.confidence)}">
+                                            ${suggestion.confidence}% similarity
+                                        </div>
+                                    </div>
+                                    <div class="merge-reason">${suggestion.reason}</div>
+                                    <div class="merge-topics-list">
+                                        ${suggestion.topics.map(topic => `
+                                            <div class="merge-topic-item">
+                                                <span class="merge-topic-status status-badge ${topic.status}">${topic.status}</span>
+                                                <span class="merge-topic-title">${escapeHtml(topic.title)}</span>
+                                                <span class="merge-topic-meta">${topic.exchanges.length} exchanges</span>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                    <div class="merge-actions">
+                                        <button class="btn-small btn-primary-small" onclick="window.app.previewMerge([${suggestion.topics.map(t => `'${t.id}'`).join(',')}])">
+                                            👁️ Preview Merge
+                                        </button>
+                                        <button class="btn-small" onclick="showToast('In the real app, this would merge the topics')">
+                                            Dismiss
+                                        </button>
                                     </div>
                                 </div>
                             `).join('')}
                         </div>
                     </div>
-
-                    <!-- Merge Suggestions -->
-                    ${mergeSuggestions.length > 0 ? `
-                        <div class="analytics-section merge-suggestions-section">
-                            <h3 class="section-title">🔗 Topic Merge Suggestions</h3>
-                            <p class="merge-description">AI detected ${mergeSuggestions.length} group${mergeSuggestions.length > 1 ? 's' : ''} of similar topics that could be merged</p>
-                            <div class="merge-list">
-                                ${mergeSuggestions.map((suggestion, index) => `
-                                    <div class="merge-suggestion-card">
-                                        <div class="merge-header">
-                                            <div class="merge-title">
-                                                <span class="merge-icon">🔀</span>
-                                                Suggested Merge #${index + 1}
-                                            </div>
-                                            <div class="merge-confidence ${this.getMergeConfidenceClass(suggestion.confidence)}">
-                                                ${suggestion.confidence}% similarity
-                                            </div>
-                                        </div>
-                                        <div class="merge-reason">${suggestion.reason}</div>
-                                        <div class="merge-topics-list">
-                                            ${suggestion.topics.map(topic => `
-                                                <div class="merge-topic-item">
-                                                    <span class="merge-topic-status status-badge ${topic.status}">${topic.status}</span>
-                                                    <span class="merge-topic-title">${escapeHtml(topic.title)}</span>
-                                                    <span class="merge-topic-meta">${topic.exchanges.length} exchanges</span>
-                                                </div>
-                                            `).join('')}
-                                        </div>
-                                        <div class="merge-actions">
-                                            <button class="btn-small btn-primary-small" onclick="window.app.previewMerge([${suggestion.topics.map(t => `'${t.id}'`).join(',')}])">
-                                                👁️ Preview Merge
-                                            </button>
-                                            <button class="btn-small" onclick="showToast('In the real app, this would merge the topics')">
-                                                Dismiss
-                                            </button>
-                                        </div>
-                                    </div>
-                                `).join('')}
-                            </div>
-                        </div>
-                    ` : ''}
-                </div>
+                ` : ''}
             </div>
         `;
     }
