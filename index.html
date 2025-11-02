@@ -18,6 +18,21 @@
                 </a>
             </div>
 
+            <!-- Project Selector -->
+            <div class="sidebar-project-selector">
+                <label class="project-selector-label">Current Project</label>
+                <div class="project-dropdown">
+                    <button id="project-selector-btn" class="project-selector-btn">
+                        <span class="project-color-dot"></span>
+                        <span id="current-project-name" class="project-name">Loading...</span>
+                        <span class="project-dropdown-icon">▼</span>
+                    </button>
+                    <div id="project-dropdown-menu" class="project-dropdown-menu hidden">
+                        <!-- Projects list populated by JS -->
+                    </div>
+                </div>
+            </div>
+
             <!-- New Topic Button -->
             <div class="sidebar-new-topic">
                 <button id="new-topic-btn" class="btn">
@@ -109,6 +124,10 @@
                     <button id="send-to-ai-btn" class="action-btn">
                         <span class="action-btn-icon">📊</span>
                         <span>Send to AI</span>
+                    </button>
+                    <button id="share-btn-header" class="action-btn">
+                        <span class="action-btn-icon">🔗</span>
+                        <span>Share</span>
                     </button>
                     <button id="new-topic-btn-header" class="action-btn">
                         <span class="action-btn-icon">➕</span>
@@ -265,6 +284,38 @@
                     </div>
                 </div>
                 <div id="ask-ai-results" class="ask-ai-results"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Share Modal -->
+    <div id="share-modal" class="search-modal hidden">
+        <div class="search-modal-backdrop"></div>
+        <div class="search-modal-content">
+            <div class="search-modal-header">
+                <h3>🔗 Share</h3>
+                <button class="search-modal-close" id="share-modal-close">✕</button>
+            </div>
+            <div class="search-modal-body">
+                <div id="share-content" class="share-content">
+                    <!-- Content populated by JS -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Manage Projects Modal -->
+    <div id="manage-projects-modal" class="search-modal hidden">
+        <div class="search-modal-backdrop"></div>
+        <div class="search-modal-content">
+            <div class="search-modal-header">
+                <h3>📁 Manage Projects</h3>
+                <button class="search-modal-close" id="manage-projects-close">✕</button>
+            </div>
+            <div class="search-modal-body">
+                <div id="manage-projects-content" class="manage-projects-content">
+                    <!-- Content populated by JS -->
+                </div>
             </div>
         </div>
     </div>

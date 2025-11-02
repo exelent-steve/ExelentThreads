@@ -1,12 +1,15 @@
 // Sample conversation data with patterns for institutional memory demo
 const conversationData = {
-    metadata: {
-        projectName: "Enterprise SaaS Platform",
-        lastUpdated: new Date().toISOString(),
-        totalTopics: 45,
-        totalExchanges: 178
-    },
-    topics: [
+    currentProjectId: "proj-1",
+    projects: [
+        {
+            id: "proj-1",
+            name: "Enterprise SaaS Platform",
+            description: "Main platform development - API, frontend, and infrastructure",
+            created: new Date(Date.now() - 180 * 24 * 60 * 60 * 1000).toISOString(),
+            updated: new Date().toISOString(),
+            color: "#2563eb",
+            topics: [
         // ERROR HANDLING PATTERN (5 topics - shows consistent preference for confidence scores + graceful fallbacks)
         {
             id: "topic-1",
@@ -709,6 +712,26 @@ const conversationData = {
                 { id: "ex-126", speaker: "claude", timestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
                   content: "Docusaurus. Free, versioned, searchable, integrates with GitHub. Notion is not developer-friendly. GitBook is expensive." }
             ]
+        }
+            ]
+        },
+        {
+            id: "proj-2",
+            name: "Mobile App Redesign",
+            description: "iOS and Android app redesign with new UX patterns",
+            created: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString(),
+            updated: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+            color: "#7c3aed",
+            topics: []
+        },
+        {
+            id: "proj-3",
+            name: "Customer Analytics Pipeline",
+            description: "Data warehouse and analytics infrastructure",
+            created: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000).toISOString(),
+            updated: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
+            color: "#10b981",
+            topics: []
         }
     ]
 };

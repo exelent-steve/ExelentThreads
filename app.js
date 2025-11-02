@@ -5,29 +5,55 @@ class App {
         this.data = conversationData;
         this.currentView = 'conversation';
         this.views = {};
-        
+
         this.init();
     }
 
-    init() {
-        // Initialize all view classes
-        this.views.conversation = new ConversationView(this.data);
-        this.views.table = new TableView(this.data);
-        this.views.board = new BoardView(this.data);
-        this.views.analytics = new AnalyticsView(this.data);
-        this.views.timeline = new TimelineView(this.data);
+    getCurrentProject() {
+        return this.data.projects.find(p => p.id === this.data.currentProjectId) || this.data.projects[0];
+    }
 
-        // Initialize dashboard views
-        this.views.activity = new ActivityDashboard(this.data);
-        this.views.health = new HealthDashboard(this.data);
-        this.views.topics = new TopicsDashboard(this.data);
-        this.views.team = new TeamDashboard(this.data);
+    getCurrentProjectData() {
+        const project = this.getCurrentProject();
+        return {
+            ...this.data,
+            topics: project.topics,
+            currentProject: project
+        };
+    }
+
+    init() {
+        // Initialize project selector
+        this.renderProjectSelector();
+
+        // Initialize all view classes (conversation views get current project data only)
+        const projectData = this.getCurrentProjectData();
+        this.views.conversation = new ConversationView(projectData);
+        this.views.table = new TableView(projectData);
+        this.views.board = new BoardView(projectData);
+        this.views.timeline = new TimelineView(projectData);
+
+        // Initialize analytics and dashboard views (get ALL data across projects)
+        this.views.analytics = new AnalyticsView(this.getAllTopicsData());
+        this.views.activity = new ActivityDashboard(this.getAllTopicsData());
+        this.views.health = new HealthDashboard(this.getAllTopicsData());
+        this.views.topics = new TopicsDashboard(this.getAllTopicsData());
+        this.views.team = new TeamDashboard(this.getAllTopicsData());
 
         // Attach global event listeners
         this.attachEventListeners();
 
         // Render initial view
         this.switchView('conversation');
+    }
+
+    getAllTopicsData() {
+        // Flatten all topics from all projects for dashboards
+        const allTopics = this.data.projects.flatMap(p => p.topics);
+        return {
+            ...this.data,
+            topics: allTopics
+        };
     }
 
     attachEventListeners() {
@@ -1002,6 +1028,180 @@ class App {
         `;
 
         modal.classList.remove('hidden');
+    }
+
+    renderProjectSelector() {
+        const project = this.getCurrentProject();
+        const projectNameEl = document.getElementById('current-project-name');
+        const projectDot = document.querySelector('.project-color-dot');
+
+        if (projectNameEl) {
+            projectNameEl.textContent = project.name;
+        }
+        if (projectDot) {
+            projectDot.style.background = project.color;
+        }
+
+        // Populate dropdown menu
+        const dropdownMenu = document.getElementById('project-dropdown-menu');
+        if (dropdownMenu) {
+            dropdownMenu.innerHTML = this.data.projects.map(p => `
+                <div class="project-menu-item ${p.id === this.data.currentProjectId ? 'active' : ''}" data-project-id="${p.id}">
+                    <span class="project-color-dot" style="background: ${p.color}"></span>
+                    <div class="project-menu-info">
+                        <div class="project-menu-name">${p.name}</div>
+                        <div class="project-menu-desc">${p.description}</div>
+                    </div>
+                    <span class="project-menu-count">${p.topics.length}</span>
+                </div>
+            `).join('') + `
+                <div class="project-menu-item new-project">
+                    <span>➕</span>
+                    <div class="project-menu-info">
+                        <div class="project-menu-name">New Project</div>
+                    </div>
+                </div>
+                <div class="project-menu-item">
+                    <span>⚙️</span>
+                    <div class="project-menu-info">
+                        <div class="project-menu-name">Manage Projects</div>
+                    </div>
+                </div>
+            `;
+
+            // Attach click handlers to project items
+            dropdownMenu.querySelectorAll('.project-menu-item[data-project-id]').forEach(item => {
+                item.addEventListener('click', () => {
+                    this.switchProject(item.dataset.projectId);
+                    dropdownMenu.classList.add('hidden');
+                });
+            });
+
+            // Handle new project
+            dropdownMenu.querySelector('.new-project').addEventListener('click', () => {
+                showToast('📁 New Project: Create a new project to organize your topics');
+                dropdownMenu.classList.add('hidden');
+            });
+
+            // Handle manage projects
+            const manageItem = dropdownMenu.querySelectorAll('.project-menu-item')[this.data.projects.length + 1];
+            if (manageItem) {
+                manageItem.addEventListener('click', () => {
+                    showToast('⚙️ Manage Projects: Edit, archive, or delete projects');
+                    dropdownMenu.classList.add('hidden');
+                });
+            }
+        }
+
+        // Toggle dropdown on button click
+        const selectorBtn = document.getElementById('project-selector-btn');
+        if (selectorBtn) {
+            selectorBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                dropdownMenu.classList.toggle('hidden');
+            });
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', () => {
+            if (dropdownMenu && !dropdownMenu.classList.contains('hidden')) {
+                dropdownMenu.classList.add('hidden');
+            }
+        });
+
+        // Share button handler
+        const shareBtnHeader = document.getElementById('share-btn-header');
+        if (shareBtnHeader) {
+            shareBtnHeader.addEventListener('click', () => {
+                this.openShareModal();
+            });
+        }
+    }
+
+    switchProject(projectId) {
+        this.data.currentProjectId = projectId;
+
+        // Re-initialize conversation views with new project data
+        const projectData = this.getCurrentProjectData();
+        this.views.conversation = new ConversationView(projectData);
+        this.views.table = new TableView(projectData);
+        this.views.board = new BoardView(projectData);
+        this.views.timeline = new TimelineView(projectData);
+
+        // Update project selector UI
+        this.renderProjectSelector();
+
+        // Re-render current view
+        if (['conversation', 'table', 'board', 'timeline'].includes(this.currentView)) {
+            this.views[this.currentView].render();
+        }
+
+        const project = this.getCurrentProject();
+        showToast(`📁 Switched to project: ${project.name}`);
+    }
+
+    openShareModal() {
+        const modal = document.getElementById('share-modal');
+        const content = document.getElementById('share-content');
+        const project = this.getCurrentProject();
+
+        content.innerHTML = `
+            <div class="share-section">
+                <h4>Share Current Project</h4>
+                <p class="share-description">Share "${project.name}" with colleagues</p>
+                <div class="share-options">
+                    <div class="share-option">
+                        <strong>Project Link:</strong>
+                        <div class="share-link-container">
+                            <input type="text" class="share-link-input" value="https://exelent.ai/projects/${project.id}" readonly />
+                            <button class="btn btn-small" onclick="navigator.clipboard.writeText('https://exelent.ai/projects/${project.id}'); showToast('🔗 Link copied to clipboard')">
+                                Copy
+                            </button>
+                        </div>
+                    </div>
+                    <div class="share-option">
+                        <strong>Share with Team:</strong>
+                        <div class="share-team-input">
+                            <input type="email" placeholder="colleague@company.com" class="share-email-input" />
+                            <select class="share-permission-select">
+                                <option>Can view</option>
+                                <option>Can edit</option>
+                                <option>Can admin</option>
+                            </select>
+                            <button class="btn btn-primary btn-small" onclick="showToast('📧 Invitation sent!')">
+                                Send Invite
+                            </button>
+                        </div>
+                    </div>
+                    <div class="share-stats">
+                        <div class="share-stat">
+                            <span class="share-stat-label">Topics:</span>
+                            <span class="share-stat-value">${project.topics.length}</span>
+                        </div>
+                        <div class="share-stat">
+                            <span class="share-stat-label">Last Updated:</span>
+                            <span class="share-stat-value">${formatRelativeTime(project.updated)}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        modal.classList.remove('hidden');
+
+        // Close handler
+        const closeBtn = document.getElementById('share-modal-close');
+        if (closeBtn) {
+            closeBtn.addEventListener('click', () => {
+                modal.classList.add('hidden');
+            });
+        }
+
+        modal.addEventListener('click', (e) => {
+            if (e.target.classList.contains('search-modal-backdrop') || e.target.classList.contains('search-modal')) {
+                modal.classList.add('hidden');
+            }
+        });
     }
 }
 
