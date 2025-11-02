@@ -63,6 +63,10 @@
                             <span class="sidebar-nav-icon">🏥</span>
                             <span>Topic Health</span>
                         </button>
+                        <button class="sidebar-nav-item" data-view="topics">
+                            <span class="sidebar-nav-icon">📋</span>
+                            <span>Topic Breakdown</span>
+                        </button>
                         <button class="sidebar-nav-item" data-view="team">
                             <span class="sidebar-nav-icon">👥</span>
                             <span>Team Performance</span>
@@ -82,13 +86,9 @@
                         <span class="sidebar-nav-icon">❓</span>
                         <span>Help</span>
                     </button>
-                    <button id="ask-ai-btn" class="sidebar-nav-item">
-                        <span class="sidebar-nav-icon">🔮</span>
-                        <span>Ask AI</span>
-                    </button>
-                    <button id="export-btn" class="sidebar-nav-item">
-                        <span class="sidebar-nav-icon">↓</span>
-                        <span>Export</span>
+                    <button id="settings-btn" class="sidebar-nav-item">
+                        <span class="sidebar-nav-icon">⚙️</span>
+                        <span>Settings</span>
                     </button>
                 </nav>
             </div>
@@ -96,10 +96,28 @@
 
         <!-- Main Content -->
         <div class="main-content">
-            <!-- Search Bar (moved here) -->
+            <!-- Header with Search and Actions -->
             <div class="content-header">
                 <div class="search-container">
                     <input type="text" id="global-search" class="global-search-input" placeholder="🔍 Search across all topics..." />
+                </div>
+                <div class="action-buttons">
+                    <button id="ask-ai-btn-header" class="action-btn action-btn-primary">
+                        <span class="action-btn-icon">🔮</span>
+                        <span>Ask AI Anything</span>
+                    </button>
+                    <button id="send-to-ai-btn" class="action-btn">
+                        <span class="action-btn-icon">📊</span>
+                        <span>Send to AI</span>
+                    </button>
+                    <button id="new-topic-btn-header" class="action-btn">
+                        <span class="action-btn-icon">➕</span>
+                        <span>New Topic</span>
+                    </button>
+                    <button id="export-btn-header" class="action-btn">
+                        <span class="action-btn-icon">↓</span>
+                        <span>Export</span>
+                    </button>
                 </div>
             </div>
 
@@ -264,6 +282,7 @@
     <script src="timeline-view.js"></script>
     <script src="activity-dashboard.js"></script>
     <script src="health-dashboard.js"></script>
+    <script src="topics-dashboard.js"></script>
     <script src="team-dashboard.js"></script>
     <script src="app.js"></script>
 </body>

@@ -20,6 +20,7 @@ class App {
         // Initialize dashboard views
         this.views.activity = new ActivityDashboard(this.data);
         this.views.health = new HealthDashboard(this.data);
+        this.views.topics = new TopicsDashboard(this.data);
         this.views.team = new TeamDashboard(this.data);
 
         // Attach global event listeners
@@ -62,11 +63,48 @@ class App {
             });
         }
 
-        // New topic button
+        // New topic button (sidebar)
         const newTopicBtn = document.getElementById('new-topic-btn');
         if (newTopicBtn) {
             newTopicBtn.addEventListener('click', () => {
                 this.handleNewTopic();
+            });
+        }
+
+        // Header action buttons
+        const askAiBtnHeader = document.getElementById('ask-ai-btn-header');
+        if (askAiBtnHeader) {
+            askAiBtnHeader.addEventListener('click', () => {
+                this.openAskAiModal();
+            });
+        }
+
+        const sendToAiBtn = document.getElementById('send-to-ai-btn');
+        if (sendToAiBtn) {
+            sendToAiBtn.addEventListener('click', () => {
+                this.handleSendToAI();
+            });
+        }
+
+        const newTopicBtnHeader = document.getElementById('new-topic-btn-header');
+        if (newTopicBtnHeader) {
+            newTopicBtnHeader.addEventListener('click', () => {
+                this.handleNewTopic();
+            });
+        }
+
+        const exportBtnHeader = document.getElementById('export-btn-header');
+        if (exportBtnHeader) {
+            exportBtnHeader.addEventListener('click', () => {
+                this.handleExport();
+            });
+        }
+
+        // Settings button
+        const settingsBtn = document.getElementById('settings-btn');
+        if (settingsBtn) {
+            settingsBtn.addEventListener('click', () => {
+                this.openSettingsModal();
             });
         }
 
@@ -295,6 +333,14 @@ class App {
         showToast('In the real app: You would enter a topic title and start a new conversation');
     }
 
+    handleSendToAI() {
+        showToast('📊 Send to AI: Select topics to analyze patterns, summarize, or get recommendations');
+    }
+
+    openSettingsModal() {
+        showToast('⚙️ Settings: Configure preferences, notifications, integrations (coming soon)');
+    }
+
     handleSearch(query) {
         const results = this.searchTopics(query);
         this.showSearchResults(results, query);
@@ -488,9 +534,6 @@ class App {
             </div>
 
             <div class="topic-modal-actions">
-                <button class="btn btn-secondary" onclick="window.app.openTopicInConversation('${topic.id}')">
-                    💬 Open in Conversation View
-                </button>
                 <button class="btn btn-secondary" onclick="window.app.closeTopicDetailModal()">
                     Close
                 </button>
