@@ -1254,13 +1254,16 @@ body {
 }
 
 .message.user .message-content {
-    background: white;
-    border: 1px solid var(--border-light);
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-medium);
+    color: var(--text-primary);
 }
 
 .message.claude .message-content {
-    background: white;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-light);
     border-left: 3px solid var(--primary-purple);
+    color: var(--text-primary);
 }
 
 .conversation-input {
@@ -1282,11 +1285,18 @@ body {
     border-radius: 6px;
     font-size: 0.875rem;
     font-family: inherit;
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+}
+
+.message-input::placeholder {
+    color: var(--text-tertiary);
 }
 
 .message-input:focus {
     outline: none;
     border-color: var(--primary-blue);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
 /* Smart Suggestions Panel */
@@ -1296,10 +1306,10 @@ body {
     left: 0;
     right: 0;
     margin-bottom: 0.5rem;
-    background: white;
+    background: var(--bg-elevated);
     border: 1px solid var(--border-medium);
     border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
     max-height: 400px;
     overflow-y: auto;
     z-index: 100;
@@ -1315,7 +1325,7 @@ body {
     font-size: 0.875rem;
     color: var(--primary-purple);
     border-bottom: 1px solid var(--border-light);
-    background: #faf5ff;
+    background: var(--bg-secondary);
 }
 
 .suggestion-item {
@@ -1502,7 +1512,7 @@ body {
 .table-container {
     flex: 1;
     overflow: auto;
-    background: var(--bg-secondary);
+    background: var(--bg-primary);
 }
 
 /* CSV Style Table */
@@ -1514,7 +1524,7 @@ body {
 .csv-table {
     border-collapse: separate;
     border-spacing: 0;
-    background: white;
+    background: var(--bg-secondary);
     border: 1px solid var(--border-light);
     border-radius: 8px;
     overflow: hidden;
@@ -1526,7 +1536,8 @@ body {
     border-bottom: 1px solid var(--border-light);
     font-size: 0.875rem;
     line-height: 1.6;
-    background: white;
+    background: var(--bg-secondary);
+    color: var(--text-primary);
 }
 
 .csv-cell:last-child {
@@ -1548,14 +1559,14 @@ body {
     position: sticky;
     left: 0;
     z-index: 2;
-    background: white;
+    background: var(--bg-secondary);
 }
 
 .sticky-col2 {
     position: sticky;
     left: 60px;
     z-index: 2;
-    background: white;
+    background: var(--bg-secondary);
 }
 
 .csv-header.sticky-col,
@@ -1565,7 +1576,7 @@ body {
 }
 
 .csv-table tbody tr:hover .csv-cell {
-    background: var(--bg-secondary);
+    background: var(--bg-tertiary);
 }
 
 .csv-table tbody tr:hover .sticky-col,
@@ -1617,7 +1628,7 @@ body {
 }
 
 .column-count {
-    background: white;
+    background: var(--bg-secondary);
     padding: 0.125rem 0.5rem;
     border-radius: 12px;
     font-size: 0.75rem;
@@ -1632,17 +1643,18 @@ body {
 }
 
 .board-card {
-    background: white;
+    background: var(--bg-secondary);
     border-radius: 8px;
     padding: 1rem;
-    border: 1px solid var(--border-light);
+    border: 1px solid var(--border-medium);
     cursor: pointer;
     transition: all 0.2s;
 }
 
 .board-card:hover {
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
     transform: translateY(-2px);
+    border-color: var(--primary-blue);
 }
 
 .board-card.expanded {
@@ -1818,7 +1830,7 @@ body {
 }
 
 .analytics-section {
-    background: white;
+    background: var(--bg-secondary);
     border: 1px solid var(--border-light);
     border-radius: 8px;
     padding: 1.5rem;
@@ -2238,7 +2250,7 @@ body {
 .timeline-view-collage {
     height: 100%;
     overflow-y: auto;
-    background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+    background: var(--bg-primary);
 }
 
 .timeline-header {
