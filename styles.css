@@ -1548,8 +1548,8 @@ body {
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
-    margin-top: calc(var(--column-index) * 80px);
-    margin-left: calc(var(--column-index) * 60px);
+    margin-top: calc(var(--column-index) * 40px);
+    margin-left: calc(var(--column-index) * 30px);
 }
 
 /* Cascade Item - Base */
