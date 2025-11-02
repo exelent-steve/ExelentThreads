@@ -17,6 +17,11 @@ class App {
         this.views.analytics = new AnalyticsView(this.data);
         this.views.timeline = new TimelineView(this.data);
 
+        // Initialize dashboard views
+        this.views.activity = new ActivityDashboard(this.data);
+        this.views.health = new HealthDashboard(this.data);
+        this.views.team = new TeamDashboard(this.data);
+
         // Attach global event listeners
         this.attachEventListeners();
 
