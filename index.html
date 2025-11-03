@@ -125,6 +125,10 @@
                         <span class="action-btn-icon">💬</span>
                         <span>Project AI Thread</span>
                     </button>
+                    <button id="ask-ai-question-btn" class="action-btn">
+                        <span class="action-btn-icon">🔮</span>
+                        <span>Ask AI Anything</span>
+                    </button>
                     <button id="share-btn-header" class="action-btn">
                         <span class="action-btn-icon">🔗</span>
                         <span>Share</span>
@@ -242,6 +246,47 @@
                 <button class="search-modal-close" id="search-modal-close">✕</button>
             </div>
             <div class="search-modal-body" id="search-results"></div>
+        </div>
+    </div>
+
+    <!-- Topic Snapshot Modal -->
+    <div id="snapshot-modal" class="search-modal hidden">
+        <div class="search-modal-backdrop"></div>
+        <div class="search-modal-content">
+            <div class="search-modal-header">
+                <h3 id="snapshot-modal-title">Topic Snapshot</h3>
+                <button class="search-modal-close" id="snapshot-modal-close">✕</button>
+            </div>
+            <div class="search-modal-body" id="snapshot-modal-body"></div>
+        </div>
+    </div>
+
+    <!-- Ask AI Anything Modal (Q&A) -->
+    <div id="ask-ai-question-modal" class="search-modal hidden">
+        <div class="search-modal-backdrop"></div>
+        <div class="search-modal-content">
+            <div class="search-modal-header">
+                <h3>🔮 Ask AI Anything</h3>
+                <button class="search-modal-close" id="ask-ai-question-close">✕</button>
+            </div>
+            <div class="search-modal-body">
+                <div class="ai-question-container">
+                    <p class="ai-question-description">Ask natural language questions about all your topics and get AI-powered answers with confidence scores.</p>
+                    <div class="ai-question-examples">
+                        <div class="ai-question-examples-label">Try asking:</div>
+                        <button class="ai-question-example-btn">"What did we decide about REST vs GraphQL?"</button>
+                        <button class="ai-question-example-btn">"How should we handle database errors?"</button>
+                        <button class="ai-question-example-btn">"What are our authentication choices?"</button>
+                    </div>
+                    <div class="ai-question-input-section">
+                        <textarea id="ai-question-input" class="ai-question-input" placeholder="Ask your question here..."></textarea>
+                        <button class="btn btn-primary" id="ai-question-submit-btn">Ask AI</button>
+                    </div>
+                    <div class="ai-question-results" id="ai-question-results">
+                        <!-- Results populated by JS -->
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 

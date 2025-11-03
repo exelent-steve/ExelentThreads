@@ -105,6 +105,13 @@ class App {
             });
         }
 
+        const askAiQuestionBtn = document.getElementById('ask-ai-question-btn');
+        if (askAiQuestionBtn) {
+            askAiQuestionBtn.addEventListener('click', () => {
+                this.openAskAiQuestionModal();
+            });
+        }
+
         const sendToAiBtn = document.getElementById('send-to-ai-btn');
         if (sendToAiBtn) {
             sendToAiBtn.addEventListener('click', () => {
@@ -238,6 +245,24 @@ class App {
             });
         }
 
+        // Ask AI Question modal close
+        const askAiQuestionModalClose = document.getElementById('ask-ai-question-close');
+        const askAiQuestionModal = document.getElementById('ask-ai-question-modal');
+
+        if (askAiQuestionModalClose) {
+            askAiQuestionModalClose.addEventListener('click', () => {
+                this.closeAskAiQuestionModal();
+            });
+        }
+
+        if (askAiQuestionModal) {
+            askAiQuestionModal.addEventListener('click', (e) => {
+                if (e.target.classList.contains('search-modal-backdrop') || e.target.classList.contains('search-modal')) {
+                    this.closeAskAiQuestionModal();
+                }
+            });
+        }
+
         // Global Escape key listener for all modals
         const escapeHandler = (e) => {
             if (e.key === 'Escape' || e.keyCode === 27) {
@@ -245,6 +270,14 @@ class App {
                 const askAiModal = document.getElementById('ask-ai-modal');
                 if (askAiModal && !askAiModal.classList.contains('hidden')) {
                     this.closeAskAiModal();
+                    e.preventDefault();
+                    return;
+                }
+
+                // Close Ask AI Question modal
+                const askAiQuestionModal = document.getElementById('ask-ai-question-modal');
+                if (askAiQuestionModal && !askAiQuestionModal.classList.contains('hidden')) {
+                    this.closeAskAiQuestionModal();
                     e.preventDefault();
                     return;
                 }
@@ -1482,9 +1515,9 @@ class App {
     }
 
     showTopicSnapshot(message) {
-        const modal = document.getElementById('search-modal');
-        const modalHeader = modal.querySelector('.search-modal-header h3');
-        const modalBody = document.getElementById('search-results');
+        const modal = document.getElementById('snapshot-modal');
+        const modalHeader = document.getElementById('snapshot-modal-title');
+        const modalBody = document.getElementById('snapshot-modal-body');
 
         const messageDate = new Date(message.timestamp);
         const formattedDate = messageDate.toLocaleDateString('en-US', {
@@ -1552,6 +1585,174 @@ class App {
 
         closeBtn.addEventListener('click', closeHandler);
         backdrop.addEventListener('click', closeHandler);
+    }
+
+    // Ask AI Question (Q&A) modal methods
+    openAskAiQuestionModal() {
+        const modal = document.getElementById('ask-ai-question-modal');
+        const resultsContainer = document.getElementById('ai-question-results');
+
+        // Clear previous results
+        resultsContainer.innerHTML = '';
+
+        modal.classList.remove('hidden');
+
+        // Attach listeners for submit and examples
+        this.attachAiQuestionListeners();
+    }
+
+    closeAskAiQuestionModal() {
+        const modal = document.getElementById('ask-ai-question-modal');
+        modal.classList.add('hidden');
+
+        // Clear input
+        const input = document.getElementById('ai-question-input');
+        if (input) input.value = '';
+    }
+
+    attachAiQuestionListeners() {
+        const submitBtn = document.getElementById('ai-question-submit-btn');
+        const input = document.getElementById('ai-question-input');
+        const exampleBtns = document.querySelectorAll('.ai-question-example-btn');
+
+        // Submit button
+        if (submitBtn && input) {
+            const submitHandler = () => {
+                const question = input.value.trim();
+                if (question) {
+                    this.handleAiQuestion(question);
+                }
+            };
+
+            submitBtn.removeEventListener('click', submitHandler);
+            submitBtn.addEventListener('click', submitHandler);
+
+            // Enter key to submit
+            input.removeEventListener('keydown', this.aiQuestionKeyHandler);
+            this.aiQuestionKeyHandler = (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    submitHandler();
+                }
+            };
+            input.addEventListener('keydown', this.aiQuestionKeyHandler);
+        }
+
+        // Example buttons
+        exampleBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const question = btn.textContent.replace(/['"]/g, '');
+                if (input) {
+                    input.value = question;
+                    this.handleAiQuestion(question);
+                }
+            });
+        });
+    }
+
+    handleAiQuestion(question) {
+        const resultsContainer = document.getElementById('ai-question-results');
+
+        // Show loading state
+        resultsContainer.innerHTML = `
+            <div class="ai-question-loading">
+                <div class="ai-question-loading-spinner"></div>
+                <p>Analyzing all topics to answer your question...</p>
+            </div>
+        `;
+
+        // Simulate AI processing
+        setTimeout(() => {
+            const answer = this.generateAiAnswer(question);
+            resultsContainer.innerHTML = answer;
+        }, 1500);
+    }
+
+    generateAiAnswer(question) {
+        const lowerQuestion = question.toLowerCase();
+        const allTopics = this.data.projects.flatMap(p => p.topics);
+
+        // Find relevant topics based on keywords
+        const relevantTopics = [];
+
+        allTopics.forEach(topic => {
+            let score = 0;
+            const searchText = (topic.title + ' ' + topic.exchanges.map(e => e.content).join(' ')).toLowerCase();
+
+            // Simple keyword matching
+            const keywords = lowerQuestion.split(' ').filter(w => w.length > 3);
+            keywords.forEach(keyword => {
+                const matches = (searchText.match(new RegExp(keyword, 'g')) || []).length;
+                score += matches * 10;
+            });
+
+            if (score > 0) {
+                relevantTopics.push({ topic, score });
+            }
+        });
+
+        // Sort by score
+        relevantTopics.sort((a, b) => b.score - a.score);
+        const topResults = relevantTopics.slice(0, 5);
+
+        if (topResults.length === 0) {
+            return `
+                <div class="ai-question-no-results">
+                    <p>I couldn't find any topics directly related to your question.</p>
+                    <p>Try rephrasing or asking about something more specific from your topics.</p>
+                </div>
+            `;
+        }
+
+        // Generate answer summary
+        const confidence = Math.min(95, Math.max(60, topResults[0].score));
+        const topicTitles = topResults.map(r => r.topic.title).join(', ');
+
+        // Create answer based on question patterns
+        let answerText = '';
+        if (lowerQuestion.includes('rest') || lowerQuestion.includes('graphql')) {
+            answerText = `Based on your discussions, you've chosen <strong>GraphQL for the main API</strong> due to better flexibility and type safety. However, you also discussed using REST for simpler endpoints. The decision includes confidence scores (70-100) for API responses and graceful degradation patterns.`;
+        } else if (lowerQuestion.includes('error') || lowerQuestion.includes('handle')) {
+            answerText = `Your error handling strategy emphasizes <strong>confidence scores (0-100)</strong> with graceful fallbacks. Key decisions include: returning structured error objects, showing users what's known with confidence indicators, and never blocking the user completely. You apply this pattern consistently across validation, API errors, and AI suggestions.`;
+        } else if (lowerQuestion.includes('database') || lowerQuestion.includes('postgres')) {
+            answerText = `You've decided on <strong>PostgreSQL</strong> as the primary database with advanced features like JSONB for flexible data. The architecture includes proper indexing strategies and confidence-based validation for data integrity.`;
+        } else if (lowerQuestion.includes('auth')) {
+            answerText = `Your authentication approach uses <strong>JWT tokens</strong> with refresh token rotation. Security includes rate limiting, proper session management, and confidence scores for multi-factor authentication attempts.`;
+        } else {
+            answerText = `Based on ${topResults.length} related topic${topResults.length > 1 ? 's' : ''}, the key decisions involve consistent patterns around confidence scoring, graceful error handling, and user-friendly fallbacks. Your approach emphasizes transparency and never completely blocking users.`;
+        }
+
+        return `
+            <div class="ai-question-answer">
+                <div class="ai-question-confidence">
+                    <span class="ai-question-confidence-label">Confidence:</span>
+                    <span class="ai-question-confidence-value">${confidence}%</span>
+                    <div class="ai-question-confidence-bar">
+                        <div class="ai-question-confidence-fill" style="width: ${confidence}%"></div>
+                    </div>
+                </div>
+                <div class="ai-question-answer-text">
+                    ${answerText}
+                </div>
+                <div class="ai-question-sources">
+                    <div class="ai-question-sources-label">📚 Based on ${topResults.length} topic${topResults.length > 1 ? 's' : ''}:</div>
+                    <div class="ai-question-sources-list">
+                        ${topResults.map(r => {
+                            const relativeConfidence = Math.round((r.score / topResults[0].score) * 100);
+                            return `
+                                <div class="ai-question-source-item" data-topic-id="${r.topic.id}">
+                                    <div class="ai-question-source-title">${escapeHtml(r.topic.title)}</div>
+                                    <div class="ai-question-source-meta">
+                                        <span class="ai-question-source-confidence">${relativeConfidence}% relevant</span>
+                                        <span class="ai-question-source-category">${r.topic.category}</span>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                </div>
+            </div>
+        `;
     }
 }
 
