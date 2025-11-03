@@ -524,11 +524,34 @@ class App {
         titleContainer.innerHTML = `
             <div class="topic-modal-title-text">${escapeHtml(topic.title)}</div>
             <div class="topic-modal-meta">
-                <span class="status-badge ${topic.status}">${topic.status.replace('-', ' ')}</span>
+                <div class="topic-modal-status-control">
+                    <label>Status:</label>
+                    <select class="topic-status-select" data-topic-id="${topic.id}">
+                        <option value="open" ${topic.status === 'open' ? 'selected' : ''}>Open</option>
+                        <option value="in-progress" ${topic.status === 'in-progress' ? 'selected' : ''}>In Progress</option>
+                        <option value="resolved" ${topic.status === 'resolved' ? 'selected' : ''}>Resolved</option>
+                        <option value="archived" ${topic.status === 'archived' ? 'selected' : ''}>Archived</option>
+                    </select>
+                </div>
                 <span class="topic-modal-category">${topic.category}</span>
                 <span class="topic-modal-priority">Priority: ${topic.priority}</span>
             </div>
         `;
+
+        // Add event listener for status change
+        setTimeout(() => {
+            const statusSelect = titleContainer.querySelector('.topic-status-select');
+            if (statusSelect) {
+                statusSelect.addEventListener('change', (e) => {
+                    const newStatus = e.target.value;
+                    topic.status = newStatus;
+                    topic.updated = new Date().toISOString();
+                    showToast(`Status changed to: ${newStatus.replace('-', ' ')}`);
+                    // Re-render to update display
+                    this.openTopicDetailModal(topicId);
+                });
+            }
+        }, 0);
 
         // Render full conversation
         bodyContainer.innerHTML = `
@@ -1256,6 +1279,279 @@ class App {
                 modal.classList.add('hidden');
             }
         });
+    }
+
+    // ============================================
+    // PROJECT AI THREAD METHODS
+    // ============================================
+
+    openProjectAIThread() {
+        // Replaces openAskAiModal - now opens Project AI Thread
+        this.openAskAiModal();
+    }
+
+    // Override openAskAiModal to show Project AI Thread instead
+    openAskAiModal() {
+        const modal = document.getElementById('ask-ai-modal');
+        const project = this.getCurrentProject();
+
+        // Render thread history
+        this.renderThreadHistory(project);
+
+        // Render topic selector
+        this.renderTopicSelector(project);
+
+        // Attach event listeners
+        this.attachThreadListeners(project);
+
+        modal.classList.remove('hidden');
+    }
+
+    renderThreadHistory(project) {
+        const historyContainer = document.getElementById('thread-history');
+        const history = project.threadHistory || [];
+
+        if (history.length === 0) {
+            historyContainer.innerHTML = '<div class="thread-empty-state">No messages yet. Start a conversation with AI about your topics.</div>';
+            return;
+        }
+
+        historyContainer.innerHTML = history.map(msg => {
+            const isUser = msg.speaker === 'user';
+            const attachedCount = msg.attachedTopicIds ? msg.attachedTopicIds.length : 0;
+            const hasSnapshots = msg.topicSnapshots && msg.topicSnapshots.length > 0;
+
+            return '<div class="thread-message ' + (isUser ? 'thread-message-user' : 'thread-message-ai') + '" data-message-id="' + msg.id + '">' +
+                '<div class="thread-message-header">' +
+                '<span class="thread-message-speaker">' + (isUser ? 'You' : 'AI') + '</span>' +
+                '<span class="thread-message-time">' + formatRelativeTime(msg.timestamp) + '</span>' +
+                '</div>' +
+                '<div class="thread-message-content">' + escapeHtml(msg.message) + '</div>' +
+                (attachedCount > 0 ? '<div class="thread-message-topics">📎 ' + attachedCount + ' topics attached' +
+                    (hasSnapshots ? ' <button class="thread-view-snapshot-btn" data-message-id="' + msg.id + '">📊 View Topics at This Time</button>' : '') +
+                '</div>' : '') +
+                '</div>';
+        }).join('');
+
+        // Add click handlers for snapshot buttons
+        historyContainer.querySelectorAll('.thread-view-snapshot-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const messageId = btn.dataset.messageId;
+                const message = history.find(m => m.id === messageId);
+                if (message && message.topicSnapshots) {
+                    this.showTopicSnapshot(message);
+                }
+            });
+        });
+    }
+
+    renderTopicSelector(project) {
+        const listContainer = document.getElementById('thread-topic-list');
+        const topics = project.topics || [];
+
+        if (topics.length === 0) {
+            listContainer.innerHTML = '<div class="thread-empty-state">No topics in this project yet.</div>';
+            return;
+        }
+
+        listContainer.innerHTML = topics.map(topic => {
+            const statusColor = getStatusColor(topic.status);
+            return '<div class="thread-topic-item" data-topic-id="' + topic.id + '">' +
+                '<input type="checkbox" class="thread-topic-checkbox" id="thread-topic-' + topic.id + '" value="' + topic.id + '">' +
+                '<label for="thread-topic-' + topic.id + '" class="thread-topic-label">' +
+                '<span class="thread-topic-status" style="background: ' + statusColor + ';"></span>' +
+                '<span class="thread-topic-title">' + escapeHtml(topic.title) + '</span>' +
+                '<span class="thread-topic-meta">' + topic.status + ' • ' + topic.exchanges.length + ' responses</span>' +
+                '</label>' +
+                '</div>';
+        }).join('');
+    }
+
+    attachThreadListeners(project) {
+        // Selection buttons
+        const selectAllBtn = document.getElementById('select-all-topics');
+        const selectNoneBtn = document.getElementById('select-none-topics');
+        const selectOpenBtn = document.getElementById('select-open-topics');
+        const sendBtn = document.getElementById('thread-send-btn');
+
+        if (selectAllBtn) {
+            selectAllBtn.addEventListener('click', () => {
+                document.querySelectorAll('.thread-topic-checkbox').forEach(cb => {
+                    cb.checked = true;
+                });
+                this.updateThreadSelectedCount();
+            });
+        }
+
+        if (selectNoneBtn) {
+            selectNoneBtn.addEventListener('click', () => {
+                document.querySelectorAll('.thread-topic-checkbox').forEach(cb => {
+                    cb.checked = false;
+                });
+                this.updateThreadSelectedCount();
+            });
+        }
+
+        if (selectOpenBtn) {
+            selectOpenBtn.addEventListener('click', () => {
+                document.querySelectorAll('.thread-topic-item').forEach(item => {
+                    const topicId = item.dataset.topicId;
+                    const topic = findTopicByIdInProjects(this.data.projects, topicId);
+                    const checkbox = item.querySelector('.thread-topic-checkbox');
+                    if (topic && checkbox) {
+                        checkbox.checked = (topic.status === 'open' || topic.status === 'in-progress');
+                    }
+                });
+                this.updateThreadSelectedCount();
+            });
+        }
+
+        // Checkbox changes
+        document.querySelectorAll('.thread-topic-checkbox').forEach(cb => {
+            cb.addEventListener('change', () => {
+                this.updateThreadSelectedCount();
+            });
+        });
+
+        // Send button
+        if (sendBtn) {
+            sendBtn.addEventListener('click', () => {
+                this.sendThreadMessage(project);
+            });
+        }
+
+        // Initial count
+        this.updateThreadSelectedCount();
+    }
+
+    updateThreadSelectedCount() {
+        const checked = document.querySelectorAll('.thread-topic-checkbox:checked').length;
+        const countEl = document.getElementById('thread-selected-count');
+        if (countEl) {
+            countEl.textContent = checked + ' topic' + (checked !== 1 ? 's' : '') + ' selected';
+        }
+    }
+
+    sendThreadMessage(project) {
+        const messageInput = document.getElementById('thread-message-input');
+        const message = messageInput ? messageInput.value.trim() : '';
+
+        if (!message) {
+            showToast('Please enter a message');
+            return;
+        }
+
+        // Get selected topics
+        const selectedTopicIds = Array.from(document.querySelectorAll('.thread-topic-checkbox:checked'))
+            .map(cb => cb.value);
+
+        // Add user message to thread history
+        const userMessage = {
+            id: 'thread-' + Date.now(),
+            speaker: 'user',
+            message: message,
+            attachedTopicIds: selectedTopicIds,
+            timestamp: new Date().toISOString()
+        };
+
+        if (!project.threadHistory) {
+            project.threadHistory = [];
+        }
+        project.threadHistory.push(userMessage);
+
+        // Clear input and re-render
+        if (messageInput) messageInput.value = '';
+        this.renderThreadHistory(project);
+        showToast('Sending message...');
+
+        // Simulate AI response
+        setTimeout(() => {
+            const aiMessage = {
+                id: 'thread-' + Date.now(),
+                speaker: 'claude',
+                message: '[AI Demo Response] Based on the ' + selectedTopicIds.length + ' topic(s) you selected: This is a simulated AI response. In the real app, this would analyze the attached topics and provide insights.',
+                timestamp: new Date().toISOString()
+            };
+            project.threadHistory.push(aiMessage);
+
+            // Re-render
+            this.renderThreadHistory(project);
+            showToast('Message sent!');
+        }, 1500);
+    }
+
+    showTopicSnapshot(message) {
+        const modal = document.getElementById('search-modal');
+        const modalHeader = modal.querySelector('.search-modal-header h3');
+        const modalBody = document.getElementById('search-results');
+
+        const messageDate = new Date(message.timestamp);
+        const formattedDate = messageDate.toLocaleDateString('en-US', {
+            month: 'short',
+            day: 'numeric',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+
+        modalHeader.textContent = '📊 Topic Snapshot - ' + formattedDate;
+
+        modalBody.innerHTML = `
+            <div class="snapshot-view">
+                <div class="snapshot-header">
+                    <p class="snapshot-description">These are the topics as they appeared at the time of this message.</p>
+                    <div class="snapshot-message-preview">
+                        <strong>Message:</strong> ${escapeHtml(message.message)}
+                    </div>
+                </div>
+                <div class="snapshot-topics">
+                    ${message.topicSnapshots.map(topic => {
+                        const statusColor = getStatusColor(topic.status);
+                        const daysAgo = Math.floor((new Date() - new Date(topic.updated)) / (1000 * 60 * 60 * 24));
+
+                        return `
+                            <div class="snapshot-topic-card">
+                                <div class="snapshot-topic-header">
+                                    <div class="snapshot-topic-title">
+                                        <span class="snapshot-topic-status" style="background: ${statusColor};"></span>
+                                        ${escapeHtml(topic.title)}
+                                    </div>
+                                    <div class="snapshot-topic-badge">${topic.status}</div>
+                                </div>
+                                <div class="snapshot-topic-meta">
+                                    <span class="snapshot-meta-item">📁 ${topic.category}</span>
+                                    <span class="snapshot-meta-item">⚡ ${topic.priority}</span>
+                                    <span class="snapshot-meta-item">💬 ${topic.exchangeCount} responses</span>
+                                    <span class="snapshot-meta-item">🕐 ${daysAgo}d ago</span>
+                                </div>
+                                <div class="snapshot-topic-content">
+                                    ${escapeHtml(topic.lastExchange)}
+                                </div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            </div>
+        `;
+
+        // Set higher z-index to appear above thread modal
+        modal.style.zIndex = '3000';
+
+        modal.classList.remove('hidden');
+
+        // Reset z-index when modal is closed
+        const closeBtn = modal.querySelector('.search-modal-close');
+        const backdrop = modal.querySelector('.search-modal-backdrop');
+
+        const closeHandler = () => {
+            modal.style.zIndex = '';
+            closeBtn.removeEventListener('click', closeHandler);
+            backdrop.removeEventListener('click', closeHandler);
+        };
+
+        closeBtn.addEventListener('click', closeHandler);
+        backdrop.addEventListener('click', closeHandler);
     }
 }
 

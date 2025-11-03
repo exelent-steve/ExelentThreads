@@ -122,20 +122,12 @@
                 </div>
                 <div class="action-buttons">
                     <button id="ask-ai-btn-header" class="action-btn action-btn-primary">
-                        <span class="action-btn-icon">🔮</span>
-                        <span>Ask AI Anything</span>
-                    </button>
-                    <button id="send-to-ai-btn" class="action-btn">
-                        <span class="action-btn-icon">📊</span>
-                        <span>Send to AI</span>
+                        <span class="action-btn-icon">💬</span>
+                        <span>Project AI Thread</span>
                     </button>
                     <button id="share-btn-header" class="action-btn">
                         <span class="action-btn-icon">🔗</span>
                         <span>Share</span>
-                    </button>
-                    <button id="new-topic-btn-header" class="action-btn">
-                        <span class="action-btn-icon">➕</span>
-                        <span>New Topic</span>
                     </button>
                     <button id="export-btn-header" class="action-btn">
                         <span class="action-btn-icon">↓</span>
@@ -265,29 +257,42 @@
         </div>
     </div>
 
-    <!-- Ask AI Modal -->
+    <!-- Project AI Thread Modal -->
     <div id="ask-ai-modal" class="search-modal hidden">
         <div class="search-modal-backdrop"></div>
-        <div class="search-modal-content ask-ai-modal-content">
+        <div class="search-modal-content thread-modal-content">
             <div class="search-modal-header">
-                <h3>🔮 Ask AI Anything</h3>
+                <h3>💬 Project AI Thread</h3>
                 <button class="search-modal-close" id="ask-ai-modal-close">✕</button>
             </div>
             <div class="search-modal-body">
-                <div class="ask-ai-input-section">
-                    <p class="ask-ai-description">Ask a question about anything you've discussed across all your conversations</p>
-                    <div class="ask-ai-input-group">
-                        <input type="text" id="ask-ai-input" class="ask-ai-input" placeholder='Try: "What did I decide about authentication?" or "Have I discussed database scaling?"'>
-                        <button class="btn btn-primary" id="ask-ai-search-btn">Ask AI</button>
+                <!-- Thread History -->
+                <div class="thread-history" id="thread-history">
+                    <div class="thread-empty-state">No messages yet. Start a conversation with AI about your topics.</div>
+                </div>
+
+                <!-- Topic Selector -->
+                <div class="thread-topic-selector">
+                    <div class="thread-section-label">Select Topics to Include</div>
+                    <div class="thread-selection-buttons">
+                        <button class="btn-small" id="select-all-topics">Select All</button>
+                        <button class="btn-small" id="select-none-topics">Select None</button>
+                        <button class="btn-small" id="select-open-topics">Select Open</button>
                     </div>
-                    <div class="ask-ai-examples">
-                        <span class="ask-ai-example-label">Examples:</span>
-                        <button class="ask-ai-example" data-question="What did I decide about REST vs GraphQL?">REST vs GraphQL?</button>
-                        <button class="ask-ai-example" data-question="What database choices have I made?">Database choices?</button>
-                        <button class="ask-ai-example" data-question="How do I handle errors?">Error handling?</button>
+                    <div class="thread-topic-list" id="thread-topic-list">
+                        <!-- Topics populated by JS -->
                     </div>
                 </div>
-                <div id="ask-ai-results" class="ask-ai-results"></div>
+
+                <!-- Message Input -->
+                <div class="thread-input-section">
+                    <textarea id="thread-message-input" class="thread-message-input"
+                              placeholder="Ask a question or provide context about the selected topics..."></textarea>
+                    <div class="thread-input-actions">
+                        <span class="thread-selected-count" id="thread-selected-count">0 topics selected</span>
+                        <button class="btn btn-primary" id="thread-send-btn">Send Message</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

@@ -9,6 +9,54 @@ const conversationData = {
             created: new Date(Date.now() - 180 * 24 * 60 * 60 * 1000).toISOString(),
             updated: new Date().toISOString(),
             color: "#2563eb",
+            threadHistory: [
+                // Example thread messages
+                {
+                    id: "thread-1",
+                    speaker: "user",
+                    message: "I just sent you comments from the draft API documentation that you sent me. I've added my feedback on the error handling, validation, and AI suggestions sections.",
+                    attachedTopicIds: ["topic-1", "topic-10", "topic-23"],
+                    timestamp: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+                    topicSnapshots: [
+                        {
+                            id: "topic-1",
+                            title: "API error handling strategy",
+                            status: "resolved",
+                            category: "architecture",
+                            priority: "high",
+                            updated: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString(),
+                            exchangeCount: 4,
+                            lastExchange: "✅ DECISION: Use graceful fallbacks. Show user what we know with confidence scores, allow manual editing."
+                        },
+                        {
+                            id: "topic-10",
+                            title: "Data validation error responses",
+                            status: "resolved",
+                            category: "API design",
+                            priority: "high",
+                            updated: new Date(Date.now() - 12 * 24 * 60 * 60 * 1000).toISOString(),
+                            exchangeCount: 4,
+                            lastExchange: "✅ DECISION: Return 422 with field-level errors. Include confidence scores for partial matches."
+                        },
+                        {
+                            id: "topic-23",
+                            title: "Handling conflicting AI suggestions",
+                            status: "in-progress",
+                            category: "AI features",
+                            priority: "medium",
+                            updated: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000).toISOString(),
+                            exchangeCount: 3,
+                            lastExchange: "When AI models disagree, show all suggestions with confidence scores and let user choose."
+                        }
+                    ]
+                },
+                {
+                    id: "thread-2",
+                    speaker: "claude",
+                    message: "Thanks for the feedback! I've reviewed your comments and added my replies to each topic. I have some questions about your approach to error confidence scores, and I need decisions on how we handle conflicting AI suggestions. Please see what I wrote in my replies - I'm waiting to hear what you think before we finalize the documentation.",
+                    timestamp: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000 + 2 * 60 * 1000).toISOString()
+                }
+            ],
             topics: [
         // ERROR HANDLING PATTERN (5 topics - shows consistent preference for confidence scores + graceful fallbacks)
         {
@@ -722,6 +770,7 @@ const conversationData = {
             created: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString(),
             updated: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
             color: "#7c3aed",
+            threadHistory: [],
             topics: []
         },
         {
@@ -731,6 +780,7 @@ const conversationData = {
             created: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000).toISOString(),
             updated: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
             color: "#10b981",
+            threadHistory: [],
             topics: []
         }
     ]
