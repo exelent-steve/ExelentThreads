@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ExelentThreads - Demo</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Main App Container -->
+    <div class="app-container">
+        <!-- Left Sidebar -->
+        <aside class="sidebar">
+            <!-- Logo -->
+            <div class="sidebar-header">
+                <a href="#" class="sidebar-logo">
+                    <span class="sidebar-logo-text">🧵 ExelentThreads</span>
+                </a>
+            </div>
+
+            <!-- Project Selector -->
+            <div class="sidebar-project-selector">
+                <label class="project-selector-label">Current Project</label>
+                <div class="project-dropdown">
+                    <button id="project-selector-btn" class="project-selector-btn">
+                        <span class="project-color-dot"></span>
+                        <span id="current-project-name" class="project-name">Loading...</span>
+                        <span class="project-dropdown-icon">▼</span>
+                    </button>
+                    <div id="project-dropdown-menu" class="project-dropdown-menu hidden">
+                        <!-- Projects list populated by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- New Topic Button -->
+            <div class="sidebar-new-topic">
+                <button id="new-topic-btn" class="btn">
+                    <span>+</span>
+                    <span>New Topic</span>
+                </button>
+            </div>
+
+            <!-- Navigation -->
+            <div class="sidebar-content">
+                <!-- Conversations Section -->
+                <div class="sidebar-section">
+                    <div class="sidebar-section-title">Conversations</div>
+                    <nav class="sidebar-nav">
+                        <button class="sidebar-nav-item active" data-view="conversation">
+                            <span class="sidebar-nav-icon">💬</span>
+                            <span>Conversation</span>
+                        </button>
+                        <button class="sidebar-nav-item" data-view="table">
+                            <span class="sidebar-nav-icon">📊</span>
+                            <span>Table</span>
+                        </button>
+                        <button class="sidebar-nav-item" data-view="board">
+                            <span class="sidebar-nav-icon">📋</span>
+                            <span>Board</span>
+                        </button>
+                        <button class="sidebar-nav-item" data-view="timeline">
+                            <span class="sidebar-nav-icon">📅</span>
+                            <span>Timeline</span>
+                        </button>
+                    </nav>
+                </div>
+
+                <!-- Dashboards Section -->
+                <div class="sidebar-section">
+                    <div class="sidebar-section-title">Dashboards</div>
+                    <nav class="sidebar-nav">
+                        <button class="sidebar-nav-item" data-view="activity">
+                            <span class="sidebar-nav-icon">🔥</span>
+                            <span>Activity Dashboard</span>
+                        </button>
+                        <button class="sidebar-nav-item" data-view="health">
+                            <span class="sidebar-nav-icon">🏥</span>
+                            <span>Topic Health</span>
+                        </button>
+                        <button class="sidebar-nav-item" data-view="topics">
+                            <span class="sidebar-nav-icon">📋</span>
+                            <span>Topic Breakdown</span>
+                        </button>
+                        <button class="sidebar-nav-item" data-view="team">
+                            <span class="sidebar-nav-icon">👥</span>
+                            <span>Team Performance</span>
+                        </button>
+                        <button class="sidebar-nav-item" data-view="analytics">
+                            <span class="sidebar-nav-icon">🧠</span>
+                            <span>Decision Intelligence</span>
+                        </button>
+                    </nav>
+                </div>
+            </div>
+
+            <!-- Footer Actions -->
+            <div class="sidebar-footer">
+                <nav class="sidebar-nav">
+                    <button id="manage-projects-btn" class="sidebar-nav-item">
+                        <span class="sidebar-nav-icon">📁</span>
+                        <span>Manage Projects</span>
+                    </button>
+                    <button id="help-btn" class="sidebar-nav-item">
+                        <span class="sidebar-nav-icon">❓</span>
+                        <span>Help</span>
+                    </button>
+                    <button id="settings-btn" class="sidebar-nav-item">
+                        <span class="sidebar-nav-icon">⚙️</span>
+                        <span>Settings</span>
+                    </button>
+                </nav>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Header with Search and Actions -->
+            <div class="content-header">
+                <div class="search-container">
+                    <input type="text" id="global-search" class="global-search-input" placeholder="🔍 Search across all topics..." />
+                </div>
+                <div class="action-buttons">
+                    <button id="ask-ai-btn-header" class="action-btn action-btn-primary">
+                        <span class="action-btn-icon">💬</span>
+                        <span>Project AI Thread</span>
+                    </button>
+                    <button id="ask-ai-question-btn" class="action-btn">
+                        <span class="action-btn-icon">🔮</span>
+                        <span>Ask AI Anything</span>
+                    </button>
+                    <button id="share-btn-header" class="action-btn">
+                        <span class="action-btn-icon">🔗</span>
+                        <span>Share</span>
+                    </button>
+                    <button id="import-csv-btn" class="action-btn">
+                        <span class="action-btn-icon">↑</span>
+                        <span>Import CSV</span>
+                    </button>
+                    <button id="export-csv-btn" class="action-btn action-btn-primary">
+                        <span class="action-btn-icon">↓</span>
+                        <span>Export CSV</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- CSV Workflow Note -->
+            <div class="csv-workflow-note">
+                <strong>📋 CSV Workflow:</strong>
+                <span>1️⃣ Import CSV → 2️⃣ View & Edit Topics → 3️⃣ Export CSV → 4️⃣ Send to Claude Code</span>
+                <span class="workflow-note-secondary">(This demo simulates the workflow with dummy data)</span>
+            </div>
+
+            <!-- View Container -->
+            <main id="view-container" class="view-container">
+                <!-- Active view renders here -->
+            </main>
+        </div>
+    </div>
+
+    <!-- Help Modal -->
+    <div id="help-modal" class="search-modal hidden">
+        <div class="search-modal-backdrop"></div>
+        <div class="search-modal-content">
+            <div class="search-modal-header">
+                <h3>💡 How to Use ExelentThreads Demo</h3>
+                <button class="search-modal-close" id="help-modal-close">✕</button>
+            </div>
+            <div class="search-modal-body">
+                <div class="help-section">
+                    <h4>🔮 Ask AI Anything (NEW!)</h4>
+                    <p><strong>How to use:</strong> Click the "🔮 Ask AI Anything" button in the top-right header.</p>
+                    <p>Ask natural language questions about ALL your conversations. Try:</p>
+                    <div class="help-keywords">
+                        <span class="help-keyword">"What did I decide about REST vs GraphQL?"</span>
+                        <span class="help-keyword">"Database choices?"</span>
+                        <span class="help-keyword">"How do I handle errors?"</span>
+                    </div>
+                    <p>Results show confidence percentages and highlight matching keywords.</p>
+                </div>
+
+                <div class="help-section">
+                    <h4>🎯 Smart Suggestions with Confidence (NEW!)</h4>
+                    <p><strong>How to use:</strong> Type in any message input box (Conversation view, Board, Table, Timeline, or modal).</p>
+                    <p>As you type, related topics appear with confidence badges:</p>
+                    <ul style="margin: 0.5rem 0 0 1.5rem; font-size: 0.875rem;">
+                        <li><strong style="color: #166534;">High (70%+):</strong> Green badge with ✓ - Very relevant</li>
+                        <li><strong style="color: #92400e;">Medium (40-69%):</strong> Yellow badge with ○ - Somewhat relevant</li>
+                        <li><strong style="color: #6b7280;">Low (<40%):</strong> Gray badge with △ - Might not be relevant</li>
+                    </ul>
+                    <p style="margin-top: 0.75rem;">Try typing these keywords:</p>
+                    <div class="help-keywords">
+                        <span class="help-keyword">"error"</span>
+                        <span class="help-keyword">"validation"</span>
+                        <span class="help-keyword">"REST"</span>
+                        <span class="help-keyword">"API"</span>
+                        <span class="help-keyword">"GraphQL"</span>
+                        <span class="help-keyword">"database"</span>
+                        <span class="help-keyword">"PostgreSQL"</span>
+                        <span class="help-keyword">"monolith"</span>
+                    </div>
+                </div>
+
+                <div class="help-section">
+                    <h4>🔗 Topic Merge Suggestions (NEW!)</h4>
+                    <p><strong>How to use:</strong> Click the "📈 Analytics" tab, then scroll down to see "Topic Merge Suggestions".</p>
+                    <p>AI automatically detects similar topics that could be combined based on:</p>
+                    <ul style="margin: 0.5rem 0 0 1.5rem; font-size: 0.875rem;">
+                        <li>Explicit related topics links (25 points each)</li>
+                        <li>Same category (25 points)</li>
+                        <li>Similar titles (30 points)</li>
+                        <li>Overlapping content (20 points)</li>
+                        <li>Needs 50%+ similarity to suggest merge</li>
+                    </ul>
+                    <p style="margin-top: 0.75rem;">Each suggestion shows similarity %, reason, topics to merge, and "Preview Merge" button.</p>
+                </div>
+
+                <div class="help-section">
+                    <h4>🔍 Global Search</h4>
+                    <p>Use the search bar at the top to find topics across all conversations. Try:</p>
+                    <div class="help-keywords">
+                        <span class="help-keyword">"confidence score"</span>
+                        <span class="help-keyword">"team familiarity"</span>
+                        <span class="help-keyword">"graceful fallback"</span>
+                    </div>
+                </div>
+
+                <div class="help-section">
+                    <h4>📈 Analytics Dashboard</h4>
+                    <p>Click the "Analytics" tab to see patterns the system has learned about your preferences, including decision patterns, work style analysis, and merge suggestions.</p>
+                </div>
+
+                <div class="help-section">
+                    <h4>⚠️ Contradiction Detector</h4>
+                    <p>Look for the topic titled <strong>"CONTRADICTION: GraphQL for admin panel"</strong> to see conflict detection in action.</p>
+                </div>
+
+                <div class="help-section">
+                    <h4>🔗 Related Topics</h4>
+                    <p>Topics with a 🔗 icon in the sidebar have related discussions. Click any topic to see the blue "Related" bar at the top.</p>
+                </div>
+
+                <div class="help-section">
+                    <h4>📅 Timeline View</h4>
+                    <p>Click the "Timeline" tab to see your topics in a visual cascading waterfall layout.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search Results Modal -->
+    <div id="search-modal" class="search-modal hidden">
+        <div class="search-modal-backdrop"></div>
+        <div class="search-modal-content">
+            <div class="search-modal-header">
+                <h3>Search Results</h3>
+                <button class="search-modal-close" id="search-modal-close">✕</button>
+            </div>
+            <div class="search-modal-body" id="search-results"></div>
+        </div>
+    </div>
+
+    <!-- Topic Snapshot Modal -->
+    <div id="snapshot-modal" class="search-modal hidden">
+        <div class="search-modal-backdrop"></div>
+        <div class="search-modal-content">
+            <div class="search-modal-header">
+                <h3 id="snapshot-modal-title">Topic Snapshot</h3>
+                <button class="search-modal-close" id="snapshot-modal-close">✕</button>
+            </div>
+            <div class="search-modal-body" id="snapshot-modal-body"></div>
+        </div>
+    </div>
+
+    <!-- Ask AI Anything Modal (Q&A) -->
+    <div id="ask-ai-question-modal" class="search-modal hidden">
+        <div class="search-modal-backdrop"></div>
+        <div class="search-modal-content">
+            <div class="search-modal-header">
+                <h3>🔮 Ask AI Anything</h3>
+                <button class="search-modal-close" id="ask-ai-question-close">✕</button>
+            </div>
+            <div class="search-modal-body">
+                <div class="ai-question-container">
+                    <p class="ai-question-description">Ask natural language questions about all your topics and get AI-powered answers with confidence scores.</p>
+                    <div class="ai-question-examples">
+                        <div class="ai-question-examples-label">Try asking:</div>
+                        <button class="ai-question-example-btn">"What did we decide about REST vs GraphQL?"</button>
+                        <button class="ai-question-example-btn">"How should we handle database errors?"</button>
+                        <button class="ai-question-example-btn">"What are our authentication choices?"</button>
+                    </div>
+                    <div class="ai-question-input-section">
+                        <textarea id="ai-question-input" class="ai-question-input" placeholder="Ask your question here..."></textarea>
+                        <button class="btn btn-primary" id="ai-question-submit-btn">Ask AI</button>
+                    </div>
+                    <div class="ai-question-results" id="ai-question-results">
+                        <!-- Results populated by JS -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Topic Detail Modal (Trello-style) -->
+    <div id="topic-detail-modal" class="topic-modal hidden">
+        <div class="topic-modal-backdrop"></div>
+        <div class="topic-modal-content">
+            <div class="topic-modal-header">
+                <div id="topic-modal-title"></div>
+                <button class="search-modal-close" id="topic-modal-close">✕</button>
+            </div>
+            <div class="topic-modal-body" id="topic-modal-body"></div>
+        </div>
+    </div>
+
+    <!-- Project AI Thread Modal -->
+    <div id="ask-ai-modal" class="search-modal hidden">
+        <div class="search-modal-backdrop"></div>
+        <div class="search-modal-content thread-modal-content">
+            <div class="search-modal-header">
+                <h3>💬 Project AI Thread</h3>
+                <button class="search-modal-close" id="ask-ai-modal-close">✕</button>
+            </div>
+            <div class="search-modal-body">
+                <!-- Thread History -->
+                <div class="thread-history" id="thread-history">
+                    <div class="thread-empty-state">No messages yet. Start a conversation with AI about your topics.</div>
+                </div>
+
+                <!-- Topic Selector -->
+                <div class="thread-topic-selector">
+                    <div class="thread-section-label">Select Topics to Include</div>
+                    <div class="thread-selection-buttons">
+                        <button class="btn-small" id="select-all-topics">Select All</button>
+                        <button class="btn-small" id="select-none-topics">Select None</button>
+                        <button class="btn-small" id="select-open-topics">Select Open</button>
+                    </div>
+                    <div class="thread-topic-list" id="thread-topic-list">
+                        <!-- Topics populated by JS -->
+                    </div>
+                </div>
+
+                <!-- Message Input -->
+                <div class="thread-input-section">
+                    <textarea id="thread-message-input" class="thread-message-input"
+                              placeholder="Ask a question or provide context about the selected topics..."></textarea>
+                    <div class="thread-input-actions">
+                        <span class="thread-selected-count" id="thread-selected-count">0 topics selected</span>
+                        <button class="btn btn-primary" id="thread-send-btn">Send Message</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Share Modal -->
+    <div id="share-modal" class="search-modal hidden">
+        <div class="search-modal-backdrop"></div>
+        <div class="search-modal-content">
+            <div class="search-modal-header">
+                <h3>🔗 Share</h3>
+                <button class="search-modal-close" id="share-modal-close">✕</button>
+            </div>
+            <div class="search-modal-body">
+                <div id="share-content" class="share-content">
+                    <!-- Content populated by JS -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Manage Projects Modal -->
+    <div id="manage-projects-modal" class="search-modal hidden">
+        <div class="search-modal-backdrop"></div>
+        <div class="search-modal-content">
+            <div class="search-modal-header">
+                <h3>📁 Manage Projects</h3>
+                <button class="search-modal-close" id="manage-projects-close">✕</button>
+            </div>
+            <div class="search-modal-body">
+                <div id="manage-projects-content" class="manage-projects-content">
+                    <!-- Content populated by JS -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Export Selection Modal -->
+    <div id="export-selection-modal" class="search-modal hidden">
+        <div class="search-modal-backdrop"></div>
+        <div class="search-modal-content">
+            <div class="search-modal-header">
+                <h3>📤 Select Topics to Export</h3>
+                <button class="search-modal-close" id="export-selection-close">✕</button>
+            </div>
+            <div class="search-modal-body">
+                <div class="export-selection-container">
+                    <p class="export-selection-description">Choose which topics to include in the CSV export:</p>
+
+                    <div class="export-presets">
+                        <label class="export-preset-option">
+                            <input type="radio" name="export-preset" value="assigned-claude" checked />
+                            <div class="export-preset-content">
+                                <div class="export-preset-header">
+                                    <strong>⚡ Assigned to Claude</strong>
+                                    <span class="export-topic-count" id="count-assigned-claude">(0 topics)</span>
+                                </div>
+                                <p>Only topics with Assignee = "Claude"</p>
+                            </div>
+                        </label>
+
+                        <label class="export-preset-option">
+                            <input type="radio" name="export-preset" value="all-open" />
+                            <div class="export-preset-content">
+                                <div class="export-preset-header">
+                                    <strong>📂 All Open Topics</strong>
+                                    <span class="export-topic-count" id="count-all-open">(0 topics)</span>
+                                </div>
+                                <p>Status = Open or In Progress</p>
+                            </div>
+                        </label>
+
+                        <label class="export-preset-option">
+                            <input type="radio" name="export-preset" value="all-topics" />
+                            <div class="export-preset-content">
+                                <div class="export-preset-header">
+                                    <strong>🌐 All Topics</strong>
+                                    <span class="export-topic-count" id="count-all-topics">(0 topics)</span>
+                                </div>
+                                <p>Export everything for full context</p>
+                            </div>
+                        </label>
+
+                        <label class="export-preset-option">
+                            <input type="radio" name="export-preset" value="custom" />
+                            <div class="export-preset-content">
+                                <div class="export-preset-header">
+                                    <strong>✅ Custom Selection...</strong>
+                                </div>
+                                <p>Manually select topics</p>
+                            </div>
+                        </label>
+                    </div>
+
+                    <div class="export-custom-selection hidden" id="export-custom-list">
+                        <div class="export-custom-header">Select topics to export:</div>
+                        <div class="export-topic-list" id="export-topic-checkboxes">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+
+                    <div class="export-selection-actions">
+                        <button class="btn" id="export-cancel-btn">Cancel</button>
+                        <button class="btn btn-primary" id="export-confirm-btn">Export CSV</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- Scripts -->
+    <script src="data.js"></script>
+    <script src="utils.js"></script>
+    <script src="conversation-view.js"></script>
+    <script src="table-view.js"></script>
+    <script src="board-view.js"></script>
+    <script src="analytics-view.js"></script>
+    <script src="timeline-view.js"></script>
+    <script src="activity-dashboard.js"></script>
+    <script src="health-dashboard.js"></script>
+    <script src="topics-dashboard.js"></script>
+    <script src="team-dashboard.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
